@@ -19,7 +19,7 @@ app.register_blueprint(mobile_information_bp)
 app.register_blueprint(manage_bp)
 
 engine = database.engine
-#logging.basicConfig(filename=datetime.datetime.now().strftime("%Y-%m-%d")+'.log',level=logging.DEBUG)
+logging.basicConfig(filename=datetime.datetime.now().strftime("%Y-%m-%d")+'.log',level=logging.DEBUG)
 @app.before_request
 def before_function():
     userid = session.get('nl_user_id') 
