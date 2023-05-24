@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/bootstrap.min.css')}}">
+  <link rel="stylesheet" href="{{url_for('static',filename = 'mystyle/mystyle.css')}}">
+  <script src="{{url_for('static',filename = 'bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  <script src="{{url_for('static',filename = 'cdnjs/jquery.min.js')}}"></script>
+  <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/bootstrap_table_css.css')}}">
+
+  <script src="{{url_for('static',filename = 'bootstrap/js/bootstrap_table_js.js')}}"></script>
+  <script src="{{url_for('static',filename = 'bootstrap/js/bootstrap_table_zn_js.js')}}"></script>
+  <script src="{{url_for('static',filename = 'bootstrap/js/bootstrap-table-locale-all.min.js')}}"></script>
+  <script src="{{url_for('static',filename = 'richarea/tinymce.min.js')}}"></script>
+
+  <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/table_icon.css')}}">
+  <link rel="stylesheet" href="{{url_for('static',filename = 'fontawesome-free-6.4.0-web/css/all.min.css')}}">
+  <link rel="stylesheet" href="{{url_for('static',filename = 'animate/animate.css')}}">
+
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark base_navbar" style="background-color: #e3f2fd;">
+    <div class="container-fluid">
+      <i class="fa-solid fa-splotch fa-2xl" style="color: #f8f9fc; margin-right:10px"></i>
+      <a class="navbar-brand" href="{{ url_for('main') }}">学习助手</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" >
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" hidden="true">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">学习</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('paper.showanserpaperlist') }}">刷题</a>
+          </li>
+        </ul>
+      </div>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        
+        <button type="button" hidden class="btn btn-light animateclass" style="background: transparent; border:0ch; color: white"
+          id='control-panel'>用户界面</button>
+        {%if user%}
+        <div class="btn-group">
+          <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {{user.username}}
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('users_bp.showusercenter') }}">个人中心</a></li>
+          </ul>
+        </div>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('logout') }}">注销</a>
+        </li>
+        {%else%}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#login">登录</button>
+        {%endif%}
+      </ul>
+    </div>
+  </nav>
+
+  <main class="d-flex flex-nowrap" >
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="height: 100vh;flex-shrink: 0;">
+      <a href="{{ url_for('show_createcenter') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <i class="fa-solid fa-hippo fa-xl"></i>&nbsp &nbsp
+        <span class="controlhead">发布中心</span>
+      </a>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto"  id="ul_header">
+        <li class="nav-item">
+          <a href="{{ url_for('show_createcenter') }}" class="nav-link  text-white " aria-current="page">
+            <i class="fa-solid fa-home"></i>&nbsp
+            主页
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('information.articlelist') }}" class="nav-link  text-white " aria-current="page">
+            <i class="fa-solid fa-pencil"></i>&nbsp
+            文章管理
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('paper.showPaperList') }}" class="nav-link text-white">
+            <i class="fa-solid fa-person-chalkboard"></i>
+            试题管理
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('paper.unlockuserpaper') }}" class="nav-link text-white">
+            <i class="fa-solid fa-hammer"></i>
+            试卷补考
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('manage.insertscore') }}" class="nav-link text-white">
+            <i class="fa-solid fa-syringe"></i>
+            积分管理
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link text-white">
+            <i class="fa-solid fa-user"></i>&nbsp
+            用户管理
+          </a>
+        </li>
+      </ul>
+      <hr>
+    </div>
+    <div class="d-flex flex-column flex-shrink-0 p-3 " style="height: 100vh;flex-shrink: 0;width:86vw;">
+      
+      {% block body %}
+
+      {% endblock %}
+    </div>
+  </main>
+</body>
+</html>
+
+<script type=text/javascript>
+
+  $('#control-panel').bind('click', function() {
+    window.location.href = '/'
+  });
+  $(document).ready(function () {
+    // each 是 为每一个匹配的元素 执行定义的方法
+      $("#ul_header").find("a").each(function () {
+        // location.pathname 获取 当前浏览器上的url 地址
+        if ($(this).attr("href") === location.pathname) {
+          $(this).addClass("active");
+        } else {
+          $(this).removeClass("active");
+        }
+      });
+  
+  });
+
+</script>

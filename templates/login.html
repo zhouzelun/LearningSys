@@ -1,0 +1,40 @@
+{%extends "base.html"%}
+{% block body %}
+<div class="container">
+    <form action="../login" id="login_form1" method="POST">
+        <div class="mb-3 form-floating">
+            <input class="form-control" name="username" id="login-username" placeholder="账号">
+            <label for="login-username">账号</label>
+        </div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages%}
+        <p style="float: left;color:red">
+            {% for message in messages %}
+            {%if message !='redirect'%}
+            {{ message }}
+            {% endif %}
+            {% endfor %}
+        </p>
+        {% endif %}
+        {% endwith %}
+        <div class="mb-3 form-floating">
+            <input type="password" class="form-control" id="login-password" placeholder="密码" name="password">
+            <label for="login-password">密码</label>
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" id="login-btn">登录</button>
+        </div>
+    </form>
+</div>
+
+
+<script type=text/javascript>
+    var msg = {{message| tojson}}
+    if(msg!='')
+    {
+        alert(msg)
+    }
+   
+    
+</script>
+{% endblock %}

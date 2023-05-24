@@ -1,0 +1,377 @@
+{%extends "base.html"%}
+{% block body %}
+<script src="{{url_for('static',filename = 'mystyle/createpapernode.js')}}"></script>
+<div class="container" style="margin-bottom: 20px;">
+    <div class="row">
+        <div class="col-sm">
+            <label class="owner-label" >试卷标题</label>
+            <input type="text" id='paper_title' placeholder="试卷标题" class="form-control" id="question_title" >
+        </div>
+    </div>
+</div>
+
+<hr style="border: 5px solid blue;"/>
+
+<div class="container" id = "question_container">
+    <form id = form_test>
+        <div class="input-dyna-add" id="all_question">
+        </div>
+        <button id="pre_quesiton_btn" type="button" class="btn btn-outline-dark btn-lg" hidden ="true">上一题</button>
+        <button id="next_quesiton_btn" style="float: right;" type="button"  class="btn btn-success btn-lg" hidden ="true">下一题</button>
+        <button id="submit_quesiton_btn" style="float: right;" type="button"  class="btn btn-success btn-lg">确定</button>
+    </form>
+</div>
+<div class="container" id = "submit_btn_container">
+    <button id="submit_btn"  type="button" style="width: 100%; margin-top: 20px;" class="btn btn-primary btn-lg" hidden ="true">交卷</button>
+</div>
+<div class="container" style = "text-align:center;" id = "result_container" hidden="true">
+    <div class="row">
+        <div class="col">
+            题目数量：
+        </div>
+        <div class="col" id="result_count">
+            4
+        </div>
+    </div> 
+    <div class="row">
+        <div class="col">
+            正确数量：
+        </div>
+        <div class="col" id="result_correct">
+        2
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            正确率：
+        </div>
+        <div class="col" id="result_proportion">
+           50%
+        </div>
+    </div>
+    <button id="return_btn"  type="button" style="width: 100%; margin-top: 20px;" class="btn btn-primary btn-lg" >返回</button>
+</div>
+<div id="progressmodal" style="z-index: 9999;" class="modal fade"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+              <p>请勿离开，点击屏幕恢复</p>
+              <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div id = 'timing' class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+              </div>
+            </div>
+            </div>
+        </div>
+    </div>
+  </div>
+<script type=text/javascript>
+    window.question_count = 0   //记录题目数量
+    window.single_count = 0   //记录d单选题目数量
+    window.judge_count = 0   //记录判断题目数量
+    window.multiple_count = 0   //记录多选题目数量
+    window.answer_question_count = 0 //记录已经回答的题目数量
+    window.paper_id = 0   //记录题目id
+    window.current_index = 0   //记录当前显示第几题 
+    window.answer = []      //记录所有答案  
+    window.record = []      //记录答题情况 
+    window.mark = [] //记录所有题目的分值
+    hassubmit = 0 //记录是否已经提交答案
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    question_container   = document.getElementById("question_container")
+    submit_btn_container =  document.getElementById("submit_btn_container")
+    result_container = document.getElementById("result_container")
+    next_quesiton_btn = document.getElementById("next_quesiton_btn")
+    pre_quesiton_btn = document.getElementById("pre_quesiton_btn")
+    submit_btn = document.getElementById("submit_btn")
+    submit_quesiton_btn = document.getElementById("submit_quesiton_btn")
+    var myModal = document.getElementById('progressmodal')
+    var modal = new bootstrap.Modal(myModal)
+    function cliknext(){
+        
+        document.getElementById("qg"+window.current_index).setAttribute("hidden",'true');//之前的隐藏
+        window.current_index++;
+        document.getElementById("qg"+window.current_index).removeAttribute("hidden");//之后的显示
+
+        if(window.current_index+1 == window.question_count || typeof window.record[window.current_index] != typeof true) //如果是最后一题 或者这题没答 就隐藏‘下一题’按钮
+        {
+            
+            next_quesiton_btn.setAttribute("hidden","true");
+            //submit_btn.removeAttribute("hidden");
+        }
+        pre_quesiton_btn.removeAttribute("hidden");
+        //console.log(window.record[window.current_index])
+        
+        if(typeof window.record[window.current_index] == typeof true)//如果这题没答就显示确定按钮
+        {
+            
+            submit_quesiton_btn.setAttribute("hidden","true");
+        }
+        else
+        {
+            submit_quesiton_btn.removeAttribute("hidden");
+        }
+    }
+
+
+    $('#submit_quesiton_btn').bind('click',function(){
+        current_answer = ''
+        isChosen = false //判断是否选择
+        var ttagElements = document.getElementsByName('btn_radio'+window.current_index);
+        var currentquestiongroup = document.getElementById('qg'+window.current_index);
+        var tagElements = $('#qg'+window.current_index).children('div').children('div').children('input')
+        
+        for(var i =0;i<tagElements.length;i++){  //记录用户回答的答案1代表选了，0代表没选
+            
+            if(tagElements[i].checked)
+            {
+                current_answer = current_answer+'1'
+                isChosen = true
+            }
+            else
+            {
+                current_answer = current_answer+'0'
+            }
+        }
+        if(!isChosen)
+        {
+            alert("请选择答案");
+            return;
+        }
+
+        for(var i =0;i<tagElements.length;i++){  //答完之后失效
+            tagElements[i].setAttribute("disabled","true")
+        }
+
+        iscorrect = (current_answer ==  window.answer[window.current_index])//判断答题是否正确
+        window.record[window.current_index] = iscorrect
+        window.answer_question_count++;
+        if(iscorrect)
+        {
+            if(window.current_index+1 == window.question_count){}
+            else{cliknext()}
+        }
+        else
+        {
+            
+            for(var i=0;i<window.answer[window.current_index].length;i++)
+            {
+                
+                if( window.answer[window.current_index][i] =='1') //若打错了，提交后选中正确答案
+                {
+                    tagElements[i].checked = true
+                }
+                else{
+                    tagElements[i].checked = false
+                }
+                if(current_answer[i] =='1')   //将用户选中的答案标红
+                {
+                    //textlabel = document.getElementById("btntext"+((window.current_index)*4+i))
+                    
+                    textlabel = $('#qg'+window.current_index).children('div').children('div').children('label')[i]
+                    textlabel.style.border='3px solid #FF0000'
+                }    
+            } 
+            next_quesiton_btn.removeAttribute("hidden"); 
+            submit_quesiton_btn.setAttribute("hidden","true")
+            
+        }
+        
+        if(window.answer_question_count ==window.question_count)
+        {
+            
+            submit_quesiton_btn.setAttribute("hidden","true")
+            next_quesiton_btn.setAttribute("hidden","true")
+            submit_btn.removeAttribute("hidden");
+        }
+        //console.log(window.record)
+    })
+
+    $('#next_quesiton_btn').bind('click',function(){
+        cliknext()
+    })
+
+    $('#pre_quesiton_btn').bind('click',function(){
+        document.getElementById("qg"+window.current_index).setAttribute("hidden",'true');
+        window.current_index--;
+        document.getElementById("qg"+window.current_index).removeAttribute("hidden");
+        if(window.current_index == 0)
+        {
+            pre_quesiton_btn.setAttribute("hidden","true");
+        }
+        next_quesiton_btn.removeAttribute("hidden","true");
+        if(typeof window.record[window.current_index] == typeof true)
+        {
+            submit_quesiton_btn.setAttribute("hidden","true");
+        }
+        else
+        {
+            submit_quesiton_btn.removeAttribute("hidden");
+        }
+    })
+
+    $('#submit_btn').bind('click',function()
+    {
+        question_container.setAttribute("hidden","true");
+        submit_btn_container.setAttribute("hidden","true");
+        result_container.removeAttribute("hidden");
+        result_count   = document.getElementById("result_count")
+        result_correct   = document.getElementById("result_correct")
+        result_proportion   = document.getElementById("result_proportion")
+        
+        result_count.innerText=window.question_count
+        correct_count = 0;
+        for(var i=0;i< window.question_count;i++){
+            if(window.record[i] == true)
+            {
+                correct_count++
+            }
+        }
+        result_correct.innerText = correct_count
+        result_proportion.innerText = (correct_count*1.0/window.question_count).toFixed(2)*100 +'%'
+        
+
+        //提交答题记录给后台
+        correct_count = 0;//记录答对的个数
+        for(var i=0;i< window.question_count;i++){
+            if(window.record[i] == true)
+            {
+                correct_count = correct_count+window.mark[i]
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: $SCRIPT_ROOT+'/paper/write_result',
+            async : false,
+            data: {'paper_id':window.paper_id,"correct_count":correct_count},
+            success: function () {
+                hassubmit=1
+            }
+        });
+    }  
+    );
+
+
+
+    $('#return_btn').bind('click',function()
+    {
+        window.location.href = $SCRIPT_ROOT+'/paper/answerpaperlist'
+    }  
+    );
+
+    $(function() {
+        var msg={{ get_flashed_messages() | tojson }} ;
+        //console.log(msg)
+        if(msg != ''){
+            window.paper_id = msg[0][0]['paper_id']
+            
+            if( msg[0][0]['ownerid']!=0)
+            {
+                $("#paper_owner").val(1)
+            }
+            $("#paper_title").val(msg[0][0]['paper_title'])
+            
+            for (var i=1;i<msg[0].length;i++){  //第一个是试卷信息,第二个开始才是题目
+                window.question_count++;
+                
+                var detail = msg[0][i]['detail'].split('|');
+                //detail.shift();
+                var type = '单选题'
+                one_answer  = ''
+                window.mark.push(msg[0][i]['mark'])
+                //console.log(detail)
+                switch( msg[0][i]['type']) {
+                    case '0':
+                        type = '单选题'
+                        window.single_count++
+                        one_answer  = ''+detail[1]+detail[3]+detail[5]+detail[7]
+                        $("#all_question").append(createanswerNode((window.question_count-1),(window.single_count-1),detail[0],detail[2],detail[4],detail[6],detail[8]));
+                       break;
+                    case '1':
+                        type = '判断题'
+                        window.judge_count++
+                        
+                        one_answer  = ''+detail[1]+detail[2]
+                        one_mark = detail[3]
+                        $("#all_question").append(createanswerjudgeNode((window.question_count-1),(window.judge_count-1),detail[0]));
+                       break;
+                    case '2':
+                       type = '多选题'
+                       window.multiple_count++
+                       one_answer  = ''+detail[1]+detail[3]+detail[5]+detail[7]
+                       $("#all_question").append(createanswermultipleNode((window.question_count-1),(window.multiple_count-1),detail[0],detail[2],detail[4],detail[6],detail[8]));
+                      break;
+                    default:
+                       break;
+               } 
+                //$("#all_question").append(createNode(type,(window.question_count-1),msg[0].length-1,detail[0],detail[2],detail[4],detail[6],detail[8]));
+                window.answer.push(one_answer)
+                
+            }
+            //console.log(window.mark)
+            $("#qg0").removeAttr("hidden");
+            //window.current_index=1;
+            if(window.question_count==1)
+            {
+                //submit_btn.removeAttribute("hidden");
+                next_quesiton_btn.setAttribute("hidden","true");
+            }
+        }
+        var inputlist = document.getElementsByTagName('input');  
+        for(var i=0;i<inputlist.length;i++)
+        {
+            inputlist[i].readOnly = true;   //设置为只读
+        }
+       
+
+        //给各个题型的总数赋值
+        $(".single_count-label").each(function(index,item){
+            item.innerText='/'+window.single_count
+        })
+        $(".judge_count-label").each(function(index,item){
+            item.innerText='/'+window.judge_count
+        })
+        $(".multiple_count-label").each(function(index,item){
+            item.innerText='/'+window.multiple_count
+        })
+    })
+
+    //检测切出去
+    timingprog = document.getElementById('timing')
+    var timing = 100
+    var leaveinterval = 0
+    var leaveflag = false
+    setInterval(function () {
+        if(leaveflag)
+        {
+            timing = timing-1
+            timingprog.setAttribute('style',"width:"+timing+"%")
+            if(timing == 0)
+            {
+                window.location.href = $SCRIPT_ROOT+'/paper/answerpaperlist'
+            }
+            //console.log(timing)
+        }
+    }, 600);
+    document.addEventListener('visibilitychange',function(){
+    var isHidden = document.hidden;
+	if(isHidden && hassubmit == 0){
+        leaveflag = true
+        modal.show()
+	}})
+    window.onbeforeunload=function(e){   
+        if(hassubmit == 0)
+        {
+            e = e || window.event;
+            if (e) {
+                e.returnValue = "当前内容未保存，确认离开？";
+            }
+            return "当前内容未保存，确认离开？";
+        }
+    }
+    document.addEventListener('mousedown', function() {
+        timing=100
+        leaveflag=false
+    })
+</script>
+{% endblock %}

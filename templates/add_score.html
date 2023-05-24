@@ -1,0 +1,46 @@
+{%extends "createcenter.html"%}
+{% block body %}
+<script src="{{url_for('static',filename = 'bootstrap-input-spinner-master/src/bootstrap-input-spinner.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename = 'mystyle/mystyle.css')}}">
+
+
+<div class="scorescontainer">
+    <span class="scorespan">一类积分</span>
+    <input id="singlemark1" class="mark" type="number" min="0" max="100" placeholder="一类积分"/>
+    <span class="scorespan">二类积分</span>
+    <input id="singlemark2" class="mark" type="number" min="0" max="100" placeholder="二类积分"/>
+    <span class="scorespan">学分</span>
+    <input id="singlemark3" class="mark" type="number" min="0" max="100" placeholder="学分"/>
+    <select class="selectpicker show-tick" data-live-search="true" id="userdroplist" title="选择用户" data-hide-disabled="true"></select>
+    <div class="d-grid gap-2">
+        <button id="addbtn" class="btn btn-primary" type="button">提交</button>
+    </div>
+</div>
+
+
+<script type=text/javascript>
+    $("input[type='number']").inputSpinner()
+    var $userdroplist = document.getElementById('userdroplist')
+    var userlist = {{userlist|tojson}}
+    //$departdroplist.innerHTML = $departdroplist.innerHTML+("<option data-content='<span class=text>safasdfas</span>'></option>")
+    function appenduserlistnode(item,index)
+    {
+        $userdroplist.innerHTML = $userdroplist.innerHTML+
+        ("<option value="+item['userid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['name']+"</span>'></option>")
+    }
+    userlist.forEach(appenduserlistnode)
+    $('#addbtn').bind('click', function() {
+        $.ajax({
+        type: "post",
+        url: '/manage/insertscore',
+        async : false,
+        data: {'userid':$userdroplist.options[$userdroplist.selectedIndex].value,'score_1':$('#singlemark1').val(),'score_2':$('#singlemark2').val(),'score_3':$('#singlemark3').val()},
+        success: function () {
+            alert('添加成功')
+        }
+        }); 
+    });
+</script>
+{% endblock %}

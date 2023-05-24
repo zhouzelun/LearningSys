@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/mystyle/mystyle.css">
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/cdnjs/jquery.min.js"></script>
+<link rel="stylesheet" href="/static/bootstrap/css/bootstrap_table_css.css">
+
+<script src="/static/bootstrap/js/bootstrap_table_js.js"></script>
+<script src="/static/bootstrap/js/bootstrap_table_zn_js.js"></script>
+<script src="/static/bootstrap/js/bootstrap-table-locale-all.min.js"></script>
+<script src="/static/richarea/tinymce.min.js"></script>
+
+<link rel="stylesheet" href="/static/bootstrap/css/table_icon.css">
+<link rel="stylesheet" href="/static/fontawesome-free-6.4.0-web/css/all.min.css">
+<link rel="stylesheet" href="/static/animate/animate.css">
+
+
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>学习平台</title>
+    <meta>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark base_navbar" hidden ="" style="background-color: #e3f2fd;">
+        <div class="container-fluid pccontainer">
+            <i class="fa-solid fa-splotch fa-2xl" style="color: #f8f9fc; margin-right:10px"></i>
+            <a class="navbar-brand" href="/">学习助手</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active animateclass" aria-current="page"
+                            href="/information/readarticlelist">文章</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link animateclass" href="/paper/answerpaperlist">答题</a>
+                    </li>
+
+                    <!--<form class="d-flex" role="search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>-->
+                </ul>
+            </div>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                
+                
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#login">登录</button>
+                
+            </ul>
+        </div>
+    </nav>
+
+    
+<link rel="stylesheet" href="/static/mystyle/mobilelogin.css">
+<div class="container">
+    <form action="../login" id="login_form1" method="POST">
+        <div class="mb-3">
+            <input class="form-control" name="username" id="login-username" placeholder="账号"  >
+        </div>
+        
+        
+        
+        <div class="mb-3">
+            <input type="password" class="form-control" id="login-password"   placeholder="密码" name="password" >
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" id="login-btn">登录</button>
+        </div>
+        
+    </form>
+</div>
+
+
+<script type=text/javascript>
+    var msg = "\u8bf7\u5148\u767b\u5f55"
+    if(msg!='')
+    {
+        alert(msg)
+    }
+   
+    
+</script>
+
+    
+</body>
+
+<script type=text/javascript>
+    $SCRIPT_ROOT = "";
+    frommobile = 1;
+    if(frommobile==1)
+    {
+        var pccontainer = document.getElementsByClassName('pccontainer')[0]
+        pccontainer.setAttribute("hidden","true");
+    }
+    var flag = 1
+    $(function() {
+      $('#mybutton').bind('click', function() {
+        $.post($SCRIPT_ROOT + '/login', {
+            username: $('input[name="modal-username"]').val(),
+            password: $('input[name="modal-password"]').val()
+        }, function() {
+            location.reload()                           
+        });
+        return false;
+      });
+      $('#control-panel').bind('click', function() {
+        window.location.href = $SCRIPT_ROOT+'/controlcenter'
+      });
+    });
+    
+</script>
+
+<!-- 登录窗口 -->
+<div id="login" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form id="login_form" class="form-group" action="./" method="POST">
+                    <div class="form-group">
+                        <label for="">用户名</label>
+                        <input name="modal-username" class="form-control" type="text" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="">密码</label>
+                        <input name="modal-password" class="form-control" type="password" placeholder="">
+                    </div>
+
+                    <div class="text-right">
+                        <!---->
+                        <button id="mybutton" class="btn btn-primary" type="submit">登录</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

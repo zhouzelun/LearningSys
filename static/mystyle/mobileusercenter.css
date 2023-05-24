@@ -1,0 +1,34 @@
+#logoutbtn
+{
+    width: inherit;
+    bottom: 10vh;
+    margin: 0 auto;
+    align-items: end;
+}
+
+body
+{
+    height: 100vh;
+}
+
+.usercentercontainer
+{
+    width: 100vw;
+    height: 100%;
+    margin: 0;
+    
+}
+
+.card-header{
+text-align: center;
+font-size: 40px;
+}
+
+.card-text{
+    text-align: center;
+    font-size: 60px;
+}
+
+.row{
+    margin: 0 auto;
+}

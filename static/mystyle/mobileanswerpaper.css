@@ -1,0 +1,82 @@
+/**回答问题界面*/
+
+
+#paper_title{
+    font-size: 40px;
+}
+
+#question_container button{
+    font-size: 80px;
+}
+
+.question-group label{
+    font-size: 60px;
+}
+
+.question-group .form-label{
+    font-size: 30px;
+}
+
+.question-group .single_count-label{
+    font-size: 30px;
+}
+
+.question-group .index-label{
+    font-size: 30px;
+}
+
+.question-group input{
+    font-size: 80px;
+}
+
+.judgequestion-group label{
+    font-size: 80px;
+}
+
+.judgequestion-group .form-label{
+    font-size: 30px;
+}
+
+.judgequestion-group .judge_count-label{
+    font-size: 30px;
+}
+
+.judgequestion-group .index-label{
+    font-size: 30px;
+}
+
+.judgequestion-group input{
+    font-size: 80px;
+}
+
+.multiplequestion-group label{
+    font-size: 80px;
+}
+
+.multiplequestion-group .form-label{
+    font-size: 30px;
+}
+
+.multiplequestion-group .multiple_count-label{
+    font-size: 30px;
+}
+
+.multiplequestion-group .index-label{
+    font-size: 30px;
+}
+
+.multiplequestion-group input{
+    font-size: 80px;
+}
+
+#submit_btn{
+    font-size: 80px;
+}
+
+#result_container div{
+    font-size: 50px;
+}
+
+#return_btn{
+    font-size: 80px;
+}

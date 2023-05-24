@@ -1,0 +1,86 @@
+{%extends "base.html"%}
+{% block body %}
+<div class="mylistcontainer">
+  <table  id="mytable" class="phonetable"  data-search="true" data-show-refresh="true" 
+  data-show-header="false" data-search="true"   data-id-field="id"  data-page-size = '6'  data-pagination='true'>
+  </table>
+</div>
+
+<script type=text/javascript>
+  var table_data =[]
+  function createarticleNode(title,content,time,url,readcount,hasread) {
+    var e_0 = document.createElement("div");
+    e_0.setAttribute("class", "one_article_content");
+    var e_1 = document.createElement("div");
+    e_1.setAttribute("class", "article_title");
+    var e_2 = document.createElement("a");
+    e_2.setAttribute("href", url);
+    e_2.setAttribute("class", "article-title-holder");
+    var e_3 = document.createElement("span");
+    e_3.setAttribute("class", "article-title");
+    e_3.appendChild(document.createTextNode(title));
+    e_2.appendChild(e_3);
+    var e_4 = document.createElement("p");
+    e_4.setAttribute("class", "article_simple");
+    e_4.appendChild(document.createTextNode(content));
+    e_2.appendChild(e_4);
+    var e_5 = document.createElement("span");
+    e_5.setAttribute("class", "article_time");
+    e_5.appendChild(document.createTextNode(time));
+    e_2.appendChild(e_5);
+    var e_6 = document.createElement("span");
+    e_6.setAttribute("class", "readcount");
+    var e_7 = document.createElement("i");
+    e_7.setAttribute("class", "fa-solid fa-eye fa-sm");
+    e_7.setAttribute("style", "margin-right:5px");
+    e_6.appendChild(e_7);
+    e_6.appendChild(document.createTextNode(readcount));
+    var e_hasread = document.createElement("span")
+    e_hasread.setAttribute("class", "hasread");
+    e_hasread.appendChild(document.createTextNode(hasread));
+    e_2.appendChild(e_6);
+    e_2.appendChild(e_hasread)
+    e_1.appendChild(e_2);
+    e_0.appendChild(e_1);
+    return e_0;
+}
+
+function gettabledata(item) {
+  hasread=''
+  if(item['hasread'])
+  {
+    hasread='已学习'
+  }
+  
+  NodeHTML = createarticleNode(item['title'],item['content'],item['time'],item['url'],item['readcountnum'],hasread).innerHTML
+  table_data.push({'id' : NodeHTML})
+}
+
+
+
+function initTable()
+{
+  
+$.ajax({
+  type: "get",
+  url: '/information/articlesimpledata',
+  async : false,
+  success: function (data) {
+      //window.location.href = $SCRIPT_ROOT+'/paper/list'
+      data['rows'].forEach(gettabledata)
+      //console.log(table_data)
+      $('#mytable').bootstrapTable({
+        locale: "zh-CN",
+        columns: [{
+          field: 'id'
+        }],
+        data: table_data
+      });
+      
+  }
+});
+}
+initTable()
+</script>
+
+{%endblock %}

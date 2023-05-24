@@ -1,0 +1,447 @@
+{%extends "createcenter.html"%}
+{% block body %}
+<script src="{{url_for('static',filename = 'mystyle/createpapernode.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrap-input-spinner-master/src/bootstrap-input-spinner.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
+
+<div class="container" style=" margin-top: 20px; width:50vw">
+    <div class="row">
+        <div class="col-sm">
+            <!--<label class="owner-label" >试卷标题</label>-->
+            <input type="text" id='paper_title' placeholder="试卷标题" class="form-control" id="question_title" >
+        </div>
+        <div class="col-sm">
+            <select  hidden data-live-search="true" id = 'paper_owner' title="权限类别" data-hide-disabled="true">
+                <option selected value="0">所有人</option>
+                <option value="1">部门所有</option>
+            </select>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-sm">
+            <select class="selectpicker show-tick" data-live-search="true" id="userdroplist" title="主持人" data-hide-disabled="true"></select>
+        </div>
+        <div class="col-sm">
+            <select id="departdroplist" class="selectpicker" data-live-search="true"  title="部门"></select>
+        </div>
+    </div>
+</div>
+
+<hr style="border: 5px solid blue;"/>
+
+<div class="container" style="width:50vw">
+    
+    <form id = form_test>
+        <div class="input-dyna-add" id="all_question">
+            <hr style="border: 5px solid blue;"/>
+            <!--<div class="question-group">
+                <div class="display-flex" style="float:left;display:flex;width:100%;">
+                    <label class="form-label" >1</label>
+                    <input id="singlemark1" class="mark" type="number" min="0" max="100" placeholder="分值"/>
+                    <button type="button" style="margin-left: auto" class="removeclass btn btn-danger">删除</button>
+                </div>
+                
+                <input type="text" name='ques_title' class="form-control" placeholder="题目内容" autocomplete="off">
+                <div class="input-group mb-3" >
+                    <div class="btn-group"  style="width:100%" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio1" id="btnradio1" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="btnradio1">A</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项A" aria-label="Server"/>
+
+                        <input type="radio" class="btn-check" name="btnradio1" id="btnradio2" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="btnradio2">B</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项B" aria-label="Server">
+
+                        <input type="radio" class="btn-check" name="btnradio1" id="btnradio3" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="btnradio3">C</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项C" aria-label="Server">
+
+                        <input type="radio" class="btn-check" name="btnradio1" id="btnradio4" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="btnradio4">D</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项D" aria-label="Server"/>
+                    </div>
+                </div>
+            </div>-->
+            <!--  radio必须有id和name，相同name为一组  -->
+        </div>
+        <div class="input-dyna-add" id="all_judgequestion">
+            <hr style="border: 5px solid blue;"/>
+
+            <!--<div class="judge_question-group">
+                <div class="display-flex">
+                    <label class="form-label" >1</label>
+                    <button type="button" style="float: right;" class="removeclass btn btn-danger">删除</button>
+                </div>
+                <input type="text" name='ques_title' class="form-control" placeholder="题目内容" autocomplete="off">
+                <div class="input-group mb-3" >
+                    <div class="btn-group"  style="width:100%" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="judgebtnradio1" id="judgebtnradio1" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="judgebtnradio1">正确</label>
+                        <input type="radio" class="btn-check" name="judgebtnradio1" id="judgebtnradio2" autocomplete="off"/>
+                        <label class="btn btn-outline-danger" for="judgebtnradio2">错误</label>
+                        
+                    </div>
+                </div>
+            </div>-->
+            <!--  radio必须有id和name，相同name为一组  -->
+        </div>
+        <div class="input-dyna-add" id="all_mutiplequestion">
+            <hr style="border: 5px solid blue;"/>
+
+             <!--<div class="multiple_question-group">
+                <div class="display-flex">
+                    <label class="form-label" >1</label>
+                    <button type="button" style="float: right;" class="removeclass btn btn-danger">删除</button>
+                </div>
+                <input type="text" name='ques_title' class="form-control" placeholder="题目内容" autocomplete="off">
+                <div class="input-group mb-3" >
+                    <div class="btn-group"  style="width:100%" role="group" aria-label="Basic radio toggle button group">
+                        <input type="checkbox" class="btn-check" name="mutiplebtnradio1" id="mutiplebtnradio1" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="mutiplebtnradio1">A</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项A" aria-label="Server"/>
+
+                        <input type="checkbox" class="btn-check" name="mutiplebtnradio1" id="mutiplebtnradio2" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="mutiplebtnradio2">B</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项B" aria-label="Server">
+
+                        <input type="checkbox" class="btn-check" name="mutiplebtnradio1" id="mutiplebtnradio3" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="mutiplebtnradio3">C</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项C" aria-label="Server">
+
+                        <input type="checkbox" class="btn-check" name="mutiplebtnradio1" id="mutiplebtnradio4" autocomplete="off"/>
+                        <label class="btn btn-outline-primary" for="mutiplebtnradio4">D</label>
+                        <input type="text" class="form-control" name='ques_option' placeholder="选项D" aria-label="Server"/>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+    </form>
+</div>
+
+<div  id="paper_funcbtngroup" class="btn-group-vertical" role="group" aria-label="Vertical button group">
+    <button id="add_item_btn" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary btn-lg">添加</button>
+    <button id="save_btn" type="button" class="btn btn-secondary btn-lg">保存</button>
+    <button id="submit_btn" type="button" class="btn btn-success btn-lg">发布</button>
+</div>
+
+<div id = "paper_typeswitch" class="btn-group-vertical" role="group" aria-label="Vertical radio toggle button group">
+    <input id="all_switch" type="radio" class="btn-check" name="vbtn-radio"  autocomplete="off"checked>
+    <label class="btn btn-outline-primary" for="all_switch">全部</label>
+    <input id="single_switch" type="radio" class="btn-check" name="vbtn-radio"  autocomplete="off">
+    <label class="btn btn-outline-primary" for="single_switch">单选题</label>
+    <input id="judge_switch" type="radio" class="btn-check" name="vbtn-radio"  autocomplete="off" >
+    <label class="btn btn-outline-primary" for="judge_switch">判断题</label>
+    <input id="multiple_switch" type="radio" class="btn-check" name="vbtn-radio" autocomplete="off">
+    <label class="btn btn-outline-primary" for="multiple_switch">多选题</label>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding: 10px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">请选择新增的题目类型</h5>
+                <button type="button" id = "dialogclosebtn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="btn-group-vertical" role="group" aria-label="Vertical radio toggle button group">
+                
+                <button id = "single_create" type="button" class="btn btn-outline-primary">单选题</button>
+                <button id = "judge_create" type="button" class="btn btn-outline-primary">判断题</button>
+                <button id = "multiple_create" type="button" class="btn btn-outline-primary">多选题</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type=text/javascript>
+    
+    window.question_count = 0   //记录单选题题目数量
+    window.judgequestion_count = 0   //记录判断题题目数量
+    window.multiplequestion_count = 0   //记录多选题题目数量
+    window.paper_id = 0   //记录题目id，0表示是新创建的，非零则代表新创建
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    delete_que=[]
+    var $dialogclosebtn = document.getElementById("dialogclosebtn")
+    var $all_switch = document.getElementById('all_switch')
+    var $all_question = document.getElementById('all_question')
+    var $all_judgequestion = document.getElementById('all_judgequestion')
+    var $all_mutiplequestion = document.getElementById('all_mutiplequestion')
+    var $userdroplist = document.getElementById('userdroplist')
+    var $departdroplist = document.getElementById('departdroplist')
+    var userlist = {{userlist|tojson}}
+    var departlist = {{departmentlist|tojson}}
+    //$departdroplist.innerHTML = $departdroplist.innerHTML+("<option data-content='<span class=text>safasdfas</span>'></option>")
+    function appenduserlistnode(item,index)
+    {
+        $userdroplist.innerHTML = $userdroplist.innerHTML+
+        ("<option value="+item['userid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['name']+"</span>'></option>")
+    }
+        
+    function appenddepartlistnode(item,index)
+    {  
+        $departdroplist.innerHTML = $departdroplist.innerHTML+
+        ("<option value="+item['departmentid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['name']+"</span>'></option>")
+        
+    }
+    userlist.forEach(appenduserlistnode)
+    departlist.forEach(appenddepartlistnode)
+
+
+
+    function deleteque(){
+        var deletegroupname =''
+        delete_que.forEach(function(item){
+            switch(item.className.split(' ')[0]){
+                case 'question-group':window.question_count = window.question_count - 1;deletegroupname='.question-group';break;
+                case 'judge_question-group':window.judgequestion_count = window.judgequestion_count - 1;deletegroupname='.judge_question-group';break;
+                case 'multiple_question-group':window.multiplequestion_count = window.multiplequestion_count - 1;deletegroupname='.mutiple_question-group';break;
+            }
+            delete_que.shift()
+            item.remove()
+            
+        })
+        $(deletegroupname).each
+        (function(index,item)
+        {
+            var label_item = item.getElementsByTagName("label")
+            label_item[0].innerText = index+1
+        }
+        );
+    }
+    $('#single_create').bind('click',function(){
+        window.question_count++              
+        $("#all_question").append(createNode(window.question_count))
+        $dialogclosebtn.click()
+        $("input[type='number']").inputSpinner()
+    }
+    );
+
+    $('#judge_create').bind('click',function(){
+        window.judgequestion_count++              
+        $("#all_judgequestion").append(createjudgeNode(window.judgequestion_count))
+        $dialogclosebtn.click()
+        $("input[type='number']").inputSpinner()
+    }
+    );
+
+    $('#multiple_create').bind('click',function(){
+        window.multiplequestion_count++              
+        $("#all_mutiplequestion").append(createmultipleNode(window.multiplequestion_count))
+        $dialogclosebtn.click()
+        $("input[type='number']").inputSpinner()
+    }
+    );
+
+    $('#all_switch').bind('click',function(){
+        $all_question.removeAttribute('hidden')
+        $all_judgequestion.removeAttribute('hidden')
+        $all_mutiplequestion.removeAttribute('hidden')
+    }
+    );
+
+
+    $('#single_switch').bind('click',function(){
+        $all_question.removeAttribute('hidden')
+        $all_judgequestion.setAttribute('hidden','true')
+        $all_mutiplequestion.setAttribute('hidden','true')
+    }
+    );
+
+    $('#judge_switch').bind('click',function(){
+        $all_question.setAttribute('hidden','true')
+        $all_judgequestion.removeAttribute('hidden')
+        $all_mutiplequestion.setAttribute('hidden','true')
+    }
+    );
+
+    $('#multiple_switch').bind('click',function(){
+        $all_question.setAttribute('hidden','true')
+        $all_judgequestion.setAttribute('hidden','true')
+        $all_mutiplequestion.removeAttribute('hidden')
+    }
+    );
+
+
+    
+    $("body").on("click",".removeclass",function(e){
+        var element = $(this).parent('div').parent('div')[0]
+        element.classList.remove('animate__fadeIn');
+        element.classList.add( 'animate__bounceOutLeft');
+        delete_que.push(element)
+        setTimeout(deleteque, 800)
+        
+        
+    });
+    //返回json格式 单选题 题目类型|题目标题|是否选择|选项题目
+    //返回json格式 判断题 题目类型|题目标题|正确|错误
+    //返回json格式 多选题 题目类型|题目标题|是否选择|选项题目
+    //题目类型 0：单选 1：判断 2：多选
+    //是否选择 1：选择 0：未选择
+    //判断题 1 为选择正确还是错误
+
+    function submitpaperdata(state){
+        var all_data = new Array();
+        $(".question-group").each
+        (function(index,item)
+        {
+            var one_question_data = "0"
+            var tagElements = item.getElementsByTagName('input');
+            
+            for(var i =0;i<tagElements.length;i++)
+            {
+                if(tagElements[i].name =="ques_title" || tagElements[i].name =="ques_option") //记录题目的标题和选项
+                {
+                    console.log(tagElements[i].className)
+                    one_question_data = one_question_data+"|"+tagElements[i].value;
+                }
+                else if( tagElements[i].name.includes('btnradio'))                                                                   //记录哪个选择题是真的
+                {
+                    if(tagElements[i].checked)
+                    {
+                        one_question_data = one_question_data+"|1";
+                    }
+                    else
+                    {
+                        one_question_data = one_question_data+"|0";
+                    }
+                } 
+            }
+            one_question_data = one_question_data + '|'+$('#singlemark'+(index+1)).val()
+            all_data.push(one_question_data)
+        }
+        );
+        $(".judge_question-group").each
+        (function(index,item)
+        {
+            var one_question_data = "1"
+            var tagElements = item.getElementsByTagName('input');
+            
+            for(var i =0;i<tagElements.length;i++)
+            {
+                if(tagElements[i].name =="ques_title" || tagElements[i].name =="ques_option" ) //记录题目的标题和选项
+                {
+                    one_question_data = one_question_data+"|"+tagElements[i].value;
+                }
+                else if( tagElements[i].name.includes('btnradio'))                                                                                //记录哪个选择题是真的
+                {
+                    if(tagElements[i].checked)
+                    {
+                        one_question_data = one_question_data+"|1";
+                    }
+                    else
+                    {
+                        one_question_data = one_question_data+"|0";
+                    }
+                } 
+            }
+            one_question_data = one_question_data + '|'+$('#judgemark'+(index+1)).val()
+            all_data.push(one_question_data)
+        }
+        );
+        $(".multiple_question-group").each
+        (function(index,item)
+        {
+            var one_question_data = "2"
+            var tagElements = item.getElementsByTagName('input');
+            
+            for(var i =0;i<tagElements.length;i++)
+            {
+                if(tagElements[i].name =="ques_title" || tagElements[i].name =="ques_option" ) //记录题目的标题和选项
+                {
+                    one_question_data = one_question_data+"|"+tagElements[i].value;
+                }
+                else if( tagElements[i].name.includes('btnradio'))                             //记录哪个选择题是真的
+                {
+                    if(tagElements[i].checked)
+                    {
+                        one_question_data = one_question_data+"|1";
+                    }
+                    else
+                    {
+                        one_question_data = one_question_data+"|0";
+                    }
+                } 
+            }
+            one_question_data = one_question_data + '|'+$('#multiplemark'+(index+1)).val()
+            all_data.push(one_question_data)
+        }
+        );
+        console.log(all_data)
+        var hostid = $userdroplist.options[$userdroplist.selectedIndex].value
+        var departmentid = $departdroplist.options[$departdroplist.selectedIndex].value
+        $.ajax({
+            type: "POST",
+            url: $SCRIPT_ROOT+'/paper/create_paper',
+            async : false,
+            data: {'all_data':all_data,"state":state,
+            "quetion_count":window.question_count+window.judgequestion_count+window.multiplequestion_count,
+            'paper_id':window.paper_id,
+            'paper_title':$("#paper_title").val(),
+            'paper_owner':$("#paper_owner option:selected").val(),
+            'hostid':hostid,
+            'departid':departmentid},
+            success: function () {
+                window.location.href = $SCRIPT_ROOT+'/paper/list'
+            }
+        });
+    }
+    $('#submit_btn').bind('click',function()
+    {
+        submitpaperdata(1)
+    }  
+    );
+
+    $('#save_btn').bind('click',function()
+    {
+        submitpaperdata(0)
+    }  
+    );
+
+
+    
+
+    $(function() {
+        var msg={{ get_flashed_messages() | tojson }} ;
+        console.log(userlist)
+        if(msg != ''){
+            window.paper_id = msg[0][0]['paper_id']
+            if( msg[0][0]['ownerid']!=0)
+            {
+                $("#paper_owner").val(1)
+            }
+            $("#paper_title").val(msg[0][0]['paper_title'])
+            var $userdroplist = document.getElementById('userdroplist')
+            $('#userdroplist').selectpicker('val', msg[0][0]['hostid']+'');
+            $('#userdroplist').selectpicker('render');
+            $('#departdroplist').selectpicker('val', msg[0][0]['departid']+'');
+            $('#departdroplist').selectpicker('render');
+            for (var i=1;i<msg[0].length;i++){
+                var detail = msg[0][i]['detail'].split('|');
+                var type = msg[0][i]['type']
+                var mark = msg[0][i]['mark']
+                //detail.shift();
+                
+                if(type==0){
+                    window.question_count++
+                    $("#all_question").append(editNode(window.question_count,detail[0],detail[1],detail[2],detail[3],detail[4],detail[5],detail[6],detail[7],detail[8],mark));
+                }
+                else if(type==1){
+                    window.judgequestion_count++
+                    $("#all_judgequestion").append(editjudgeNode(window.judgequestion_count,detail[0],detail[1],detail[2],mark));
+                }
+                else if(type==2){
+                    window.multiplequestion_count++
+                    $("#all_mutiplequestion").append(editmultipleNode(window.multiplequestion_count,detail[0],detail[1],detail[2],detail[3],detail[4],detail[5],detail[6],detail[7],detail[8],mark));
+                }
+                //
+            }
+        }
+        $("input[type='number']").inputSpinner()
+        
+           
+
+        
+    })
+</script>
+{% endblock %}

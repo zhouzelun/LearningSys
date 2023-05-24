@@ -1,0 +1,227 @@
+{%extends "createcenter.html"%}
+{% block body %}
+<style>
+  .select,
+  #locale {
+    width: 100%;
+  }
+  .like {
+    margin-right: 10px;
+  }
+</style>
+<div id="toolbar">
+  <button id="remove" class="btn btn-danger" disabled hidden>
+    <i class="fa fa-trash"></i> 删除
+  </button>
+  <button id="add" class="btn btn-primary">
+    <i class="fa fa-plus"></i> 添加
+  </button>
+</div>
+<table id="table" data-toolbar="#toolbar" data-search="true" data-show-refresh="true" data-show-fullscreen="true"
+  data-show-columns-toggle="true" showRefresh="true" data-click-to-select="true" data-minimum-count-columns="2" data-pagination="true"
+  data-id-field="paperid" data-side-pagination="cilent" data-response-handler="responseHandler"  data-page-size = '10' >
+</table>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">确认提示</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        删除后不可恢复！
+      </div>
+      <div class="modal-footer">
+        <button type="button" id = "dialogclose" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+        <button type="button" id = "continuedelete" class="btn btn-primary">继续删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type=text/javascript>
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  var $table = $('#table')
+  var $remove = $('#remove')
+  var $continuedelete = $('#continuedelete')
+  var $add = $('#add')
+  var $exampleModal = document.getElementById("exampleModal")
+  var $dialogclose = document.getElementById("dialogclose")
+  
+  var selections = []
+  var deletepaperid = -1 //记录需要删除的记录
+
+  function getIdSelections() {
+    return $.map($table.bootstrapTable('getSelections'), function (row) {
+      return row.id
+    })
+  }
+
+  function responseHandler(res) {
+    $.each(res.rows, function (i, row) {
+      row.state = $.inArray(row.id, selections) !== -1
+    })
+    return res
+  }
+
+  function operateFormatter(value, row, index) {
+    return [
+      '<a class="like" href="javascript:void(0)" title="编辑">',
+      '<i class="fas fa-cog fa-2x"></i>',
+      '</a>  ',
+      '<a class="remove" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#exampleModal" title="删除">',
+      '<i class="fa-sharp fa-solid fa-xmark fa-2x"></i>',
+      '</a>',
+    ].join('')
+  }
+
+
+  window.operateEvents = {
+    'click .like': function (e, value, row, index) {
+      //alert(row['paperid']+'  You click like action, row: ' + JSON.stringify(row))
+      window.location.href = $SCRIPT_ROOT+'/paper/edit_paper?paper_id='+row['paperid']
+    },
+    'click .remove': function (e, value, row, index) {
+      deletepaperid=row.paperid
+
+    }
+  }
+  function rowStyle(row, index) {
+    var style = {};            
+    style1={css:{'background-color':'rgb(221, 219, 219)'}};     
+    style2={css:{'background-color':'white'}};  
+    if(row['ispublish']=='未发布'){
+        return style1;
+    }         
+    return style2;
+    
+  }
+  function initTable() {
+    
+    $table.bootstrapTable({
+      url:$SCRIPT_ROOT+ '/paper/paperdata/state=0,1',
+      dataType: "json",
+      rowStyle:rowStyle,
+      height:800,
+      locale: "zh-CN",
+      columns: [
+        [{
+          field: 'state',
+          checkbox: true,
+          rowspan: 2,
+          align: 'center',
+          valign: 'middle'
+        },{
+          title: '序号',
+          rowspan: 2,
+          field: 'index',
+          align: 'center',
+          valign: 'middle'
+        },{
+          title: '试卷序号',
+          field: 'paperid',
+          rowspan: 2,
+          align: 'center',
+          valign: 'middle',
+          sortable: true,
+          visible: false
+        }, {
+          title: '详细信息',
+          colspan: 7,
+          align: 'center'
+        }],
+        [{
+          field: 'paper_title',
+          title: '试卷名称',
+          sortable: true,
+          align: 'center'
+        }, {
+          field: 'ownerid',
+          title: '创建者',
+          sortable: true,
+          align: 'center'
+        }, {
+          field: 'question_count',
+          title: '题目数量',
+          sortable: true,
+          align: 'center'
+        },{
+          field: 'createtime',
+          title: '创建时间',
+          sortable: true,
+          align: 'center'
+        },{
+          field: 'modifytime',
+          title: '修改时间',
+          sortable: true,
+          align: 'center'
+        },{
+          field: 'ispublish',
+          title: '状态',
+          sortable: true,
+          align: 'center'
+        },{
+          field: 'operate',
+          title: '操作',
+          align: 'center',
+          clickToSelect: false,
+          events: window.operateEvents,
+          formatter: operateFormatter
+        }]
+      ]
+    })
+    $table.on('check.bs.table uncheck.bs.table ' +
+      'check-all.bs.table uncheck-all.bs.table',
+    function () {
+      $remove.prop('disabled', !$table.bootstrapTable('getSelections').length)
+
+      // save your data, here just save the current page
+      selections = getIdSelections()
+      // push or splice the selections if you want to save all data selections
+    })
+    $table.on('all.bs.table', function (e, name, args) {
+      console.log(name, args)
+    })
+    $remove.click(function () {
+      var ids = getIdSelections()
+      $table.bootstrapTable('remove', {
+        field: 'paperid',
+        values: ids
+      })
+      $remove.prop('disabled', true)
+    })
+
+    $add.click(function () {
+      window.location.href = $SCRIPT_ROOT+'/paper/create_paper'
+    })
+    $continuedelete.click(function(){
+      $dialogclose.click()
+      $table.bootstrapTable('remove', {
+        field: 'paperid',
+        values: [deletepaperid]
+      })
+      $.ajax({
+        type: "POST",
+        url: $SCRIPT_ROOT+'/paper/deletepaper',
+        async : false,
+        data: {'paper_id':deletepaperid},
+        success: function () {
+            //window.location.href = $SCRIPT_ROOT+'/paper/list'
+            initTable()
+        }
+    });
+    }
+    )
+  }
+  $(function() {
+    initTable()
+    $('#locale').change(initTable)
+    $(window).resize(function () {
+      $('#table').bootstrapTable('resetView');
+  });
+  })
+</script>
+{% endblock %}

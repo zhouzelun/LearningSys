@@ -1,0 +1,45 @@
+{%extends "base.html"%}
+{% block body %}
+
+<div class="article-container" >
+    <h1 id="article_title" >
+    </h1>
+    <div id="read_info">
+        <span id="modifytime"></span>
+        <i class="fa-solid fa-eye"></i>
+        <span id="readcountnum"></span>
+    </div>
+    <div id="article_content">
+    </div>
+</div>
+<script type=text/javascript>
+    var title = {{article['title']| tojson}}
+    var content = {{article['content']| tojson}}
+    var modifytime = {{article['modifytime']| tojson}}
+    var article_id = {{article['article_id']| tojson}}
+    var readcountnum = {{readcountnum}}
+    var $article_content = document.getElementById('article_content');
+    var $article_title = document.getElementById('article_title');
+    var $modifytime = document.getElementById('modifytime');
+    var $readcountnum = document.getElementById('readcountnum');
+    $article_content.innerHTML=content
+    $article_title.innerHTML=title
+    $modifytime.innerHTML = modifytime
+    $readcountnum.innerHTML=readcountnum
+
+    window.setTimeout(recordread,5000)
+    function recordread(){
+        $.ajax({
+            type: "post",
+            url: '/information/recordread',
+            async : false,
+            data:{'id':article_id},
+            success: function () {}
+          });
+    }
+    // 监听 visibility change 事件 
+    
+
+</script>
+
+{%endblock %}

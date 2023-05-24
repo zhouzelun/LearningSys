@@ -1,0 +1,99 @@
+{%extends "createcenter.html"%}
+{% block body %}
+
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
+<script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
+
+<select class="selectpicker show-tick" data-live-search="true" id="paperdroplist" title="试卷" data-hide-disabled="true"></select>
+<table id="table" class="locktable"  data-toolbar="#toolbar" data-search="true" data-show-refresh="true" 
+  data-show-columns-toggle-all="true" data-click-to-select="true" data-minimum-count-columns="2"  data-side-pagination="client" data-page-size = '6' data-pagination='true' >
+</table>
+
+<script type=text/javascript>
+$paperdroplist = document.getElementById('paperdroplist')
+current_paper_id =0
+paperdroplist= $('#paperdroplist')
+var paperlist = {{data|tojson}}
+var $table = $('#table')
+console.log(paperlist)
+function appendpaperlistnode(item,index)
+{  
+    $paperdroplist.innerHTML = $paperdroplist.innerHTML+
+    ("<option value="+item['paperid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['paper_title']+"</span>'></option>")
+        
+}
+paperlist.forEach(appendpaperlistnode)
+
+paperdroplist.on('changed.bs.select',function(e){
+    current_paper_id = ($paperdroplist.options[$paperdroplist.selectedIndex].value)
+    console.log(current_paper_id)
+    $table.bootstrapTable('destroy')
+    initTable()
+})
+
+function operateFormatter(value, row, index) {
+    return [
+      '<a class="unlock" href="javascript:void(0)"  title="删除">',
+      '<i class="fa-sharp fa-solid fa-lock-open fa-2x"></i>',
+      '</a>',
+    ].join('')
+}
+
+window.operateEvents = {
+    'click .unlock': function (e, value, row, index) {
+      $table.bootstrapTable('remove', {
+        field: 'answerid',
+        values: [row.answerid]
+      })
+      $.ajax({
+        type: "POST",
+        url: '/paper/unlockpaper',
+        async : false,
+        data: {'answerid':row.answerid},
+        success: function () {
+            //window.location.href = $SCRIPT_ROOT+'/paper/list'
+            initTable()
+        }
+    });
+    }
+}
+function initTable() {
+    $table.bootstrapTable({
+      url:'/paper/lockuserdata?paper_id='+current_paper_id,
+      dataType: "json",
+      locale: "zh-CN",
+      columns: [
+        [{
+          field: 'answerid',
+          title: '序号',
+          sortable: true,
+          align: 'center',
+          visible:false
+        }, {
+          field: 'workid',
+          title: '工号',
+          sortable: true,
+          align: 'center'
+        }, {
+          field: 'username',
+          title: '姓名',
+          sortable: true,
+          align: 'center'
+        }, {
+          field: 'insertdate',
+          title: '记录日期',
+          sortable: true,
+          align: 'center'
+        },{
+          field: 'hasanaser',
+          title: '操作',
+          align: 'center',
+          clickToSelect: false,
+          events: window.operateEvents,
+          formatter: operateFormatter
+        }]
+      ]
+    })
+}
+</script>
+{% endblock %}

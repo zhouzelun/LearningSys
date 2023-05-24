@@ -1,0 +1,44 @@
+
+/*answerpaperlsit*/
+
+.phonetable thead th{
+    border:none;
+}
+.phonetable {border: 0px;}
+.phonetable tr{border-bottom:solid 2px rgb(221, 219, 219);border-right: 0px;border-left:0px;border-top: 0px;}
+.phonetable td{border: 0px;}
+.phonetable tbody{border: 0px;}
+.fixed-table-border{visibility: hidden;}
+.fixed-table-header{border: none;}
+
+.phoneanswertable{
+    font-size: 80px;
+}
+
+.bootstrap-table .fixed-table-container.fixed-height:not(.has-footer) {
+    border-bottom: none
+}
+
+.mylistcontainer{
+    margin-left: 0;
+    margin-right: 0;
+    height: 85vh;
+}
+.mylistcontainer .bootstrap-table .fixed-table-toolbar .search-input{
+    height: 100px;
+    width: 60vw;
+    font-size: 80px;
+}
+
+.mylistcontainer .bootstrap-table .fixed-table-toolbar .columns .btn{
+    height: 100px;
+    width: 100px;
+}
+
+.pagination li{
+    width: 80px;
+}
+
+.pagination li a{
+    font-size: 80px;
+}

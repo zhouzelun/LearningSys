@@ -1,0 +1,165 @@
+{%extends "base.html"%}
+{% block body %}
+<div class="usercentercontainer">
+  {% with messages = get_flashed_messages() %}
+  <p id="user_name" style="font-size: 50px;">{{ messages[0][0]['username']}}</p>
+  <div class="row">
+    <div class="col">
+      <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">一类积分</div>
+        <div class="card-body">
+
+          <p class="card-text">{{messages[0][0]['userscore'][0]}}</p>
+
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">二类积分</div>
+        <div class="card-body">
+          <p class="card-text">{{messages[0][0]['userscore'][1]}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">学分</div>
+        <div class="card-body">
+          <p class="card-text">{{messages[0][0]['userscore'][2]}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+
+  <div class="container">
+    <table id="answerrecordtable" class="table table-striped" data-toolbar="#toolbar" data-minimum-count-columns="2"
+      data-id-field="index" data-side-pagination="client" data-page-size='5'></table>
+
+    <table id="readrecordtable" class="table table-striped" data-toolbar="#toolbar" data-minimum-count-columns="2"
+      data-id-field="index" data-side-pagination="client" data-page-size='5'></table>
+
+  </div>
+
+  <div class="d-grid gap-2">
+    <a class="nav-link" href="{{ url_for('logout') }}">
+    <button id="logoutbtn" class="btn btn-cancel" style="background-color:gray;border:none" type="button">注销</button>
+    </a>
+  </div>
+
+</div>
+
+
+
+
+<script type=text/javascript>
+    $SCRIPT_ROOT = ''
+    var msg={{ get_flashed_messages() |tojson}} ;
+    var $user_score = document.getElementById("user_score")
+    var $user_name = document.getElementById("user_name")
+    var $answerrecordtable = $('#answerrecordtable')
+    var $readrecordtable = $('#readrecordtable')
+    function initTable() {
+      $answerrecordtable.bootstrapTable({
+        url:$SCRIPT_ROOT+ '/user/answerdata',
+        dataType: "json",
+        locale: "zh-CN",
+        columns: [
+          [{
+            title: '序号',
+            field: 'index',
+            align: 'center',
+            valign: 'middle',
+            visible:false
+          },{
+            title: '试卷名称',
+            field: 'papername',
+            align: 'center',
+            valign: 'middle'
+          },{
+            title: '分数',
+            field: 'score',
+            align: 'center',
+            valign: 'middle',
+            width: 10
+          },{
+            title: '积分1',
+            field: 'score_1',
+            align: 'center',
+            valign: 'middle',
+            width: 1
+          },{
+            title: '积分2',
+            field: 'score_2',
+            align: 'center',
+            valign: 'middle',
+            width: 10
+          },{
+            title: '时间',
+            field: 'insertdate',
+            align: 'center',
+            valign: 'middle'
+          }]
+        ]
+      })
+
+      $readrecordtable.bootstrapTable({
+        url:$SCRIPT_ROOT+ '/user/readdata',
+        dataType: "json",
+        locale: "zh-CN",
+        columns: [
+          [{
+            title: '序号',
+            field: 'index',
+            align: 'center',
+            valign: 'middle',
+            visible:false
+          },{
+            title: '文章名称',
+            field: 'title',
+            align: 'center',
+            valign: 'middle'
+          },{
+            title: '积分1',
+            field: 'score_1',
+            align: 'center',
+            valign: 'middle'
+          },{
+            title: '积分2',
+            field: 'score_2',
+            align: 'center',
+            valign: 'middle'
+          },{
+            title: '时间',
+            field: 'insertdate',
+            align: 'center',
+            valign: 'middle'
+          }]
+        ]
+      })
+    }
+    $(function() {
+      initTable()
+      //$('#locale').change(initTable)
+    })
+
+    $('#logoutbtn').bind('click', function() {
+      $.ajax({
+            type: "POST",
+            url: '/logout',
+            async : false,
+            data: {'all_data':all_data,"state":state,
+            "quetion_count":window.question_count+window.judgequestion_count+window.multiplequestion_count,
+            'paper_id':window.paper_id,
+            'paper_title':$("#paper_title").val(),
+            'paper_owner':$("#paper_owner option:selected").val(),
+            'hostid':hostid,
+            'departid':departmentid},
+            success: function () {
+                window.location.href = $SCRIPT_ROOT+'/paper/list'
+            }
+        });
+    });
+</script>
+{% endblock %}

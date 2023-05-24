@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename = 'mystyle/mystyle.css')}}">
+<script src="{{url_for('static',filename = 'bootstrap/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'cdnjs/jquery.min.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/bootstrap_table_css.css')}}">
+
+<script src="{{url_for('static',filename = 'bootstrap/js/bootstrap_table_js.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrap/js/bootstrap_table_zn_js.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrap/js/bootstrap-table-locale-all.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'richarea/tinymce.min.js')}}"></script>
+
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap/css/table_icon.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename = 'fontawesome-free-6.4.0-web/css/all.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename = 'animate/animate.css')}}">
+
+<link rel="stylesheet" href="{{url_for('static',filename = 'mystyle/guidtabbar.css')}}">
+
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>学习平台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark base_navbar" style="height: 8vh;background-color: #e3f2fd;">
+        <div class="topnavbar">
+            <i class="fa-solid fa-splotch fa-2xl" style="color: #f8f9fc; margin-right:10px"></i>
+            <a class="navbar-brand" href="{{url_for('main')}}">学习助手</a>
+        </div>
+    </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark base_navbar" hidden ="" style="background-color: #e3f2fd;">
+        <div class="container-fluid pccontainer">
+            <i class="fa-solid fa-splotch fa-2xl" style="color: #f8f9fc; margin-right:10px"></i>
+            <a class="navbar-brand" href="{{ url_for('main') }}">学习助手</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active animateclass" aria-current="page"
+                            href="{{ url_for('information.showreadarticlelist') }}">文章</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link animateclass" href="{{ url_for('paper.showanserpaperlist') }}">答题</a>
+                    </li>
+
+                    <!--<form class="d-flex" role="search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>-->
+                </ul>
+            </div>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {%if manage%}
+                <button type="button" class="btn btn-light animateclass"
+                    style="background: transparent; border:0ch; color: white" id='control-panel'>控制台</button>
+                {%endif%}
+                {%if user%}
+                <div class="btn-group">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        {{user.username}}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('users_bp.showusercenter') }}">个人中心</a></li>
+                    </ul>
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">注销</a>
+                </li>
+                {%else%}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#login">登录</button>
+                {%endif%}
+            </ul>
+        </div>
+    </nav>
+
+    {% block body %}
+
+    {% endblock %}
+    <div class="fakebottom"></div>
+    <div class="bottom-nav">
+        <ul>
+            <li id="guidelink1">                                
+                <a  href="{{url_for('information.showreadarticlelist') }}" >
+                    <img id="guidelinkimg1" data="0"  src="../images/file-word.png" alt="">
+                    <span>文章</span>
+                </a>
+            </li>
+
+            <li id="guidelink2">
+                <a class="guidelink" href="{{url_for('paper.showanserpaperlist') }}" >
+                    <img id="guidelinkimg2" data="0" src="../images/dice.png" alt="">
+                    <span>答题</span>
+                </a>
+            </li>
+
+            <li id="guidelink3">
+                <a class="guidelink" href="{{url_for('users_bp.showusercenter') }}">
+                    <img id="guidelinkimg3" data="0" src="../images/home.png" alt="">
+                    <span>我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    
+<!-- 登录窗口 -->
+<div id="login" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form id="login_form" class="form-group" action="./" method="POST">
+                    <div class="form-group">
+                        <label for="">用户名</label>
+                        <input name="modal-username" class="form-control" type="text" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="">密码</label>
+                        <input name="modal-password" class="form-control" type="password" placeholder="">
+                    </div>
+
+                    <div class="text-right">
+                        <!--{%for message in get_flashed_messages()%}
+                                <p class="text-danger">{{message}}</p>
+                            {%endfor%}-->
+                        <button id="mybutton" class="btn btn-primary" type="submit">登录</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    frommobile = {{frommobile}};
+    var guidbarindex = {"img1": 1, "img2": 0, "img3": 0}
+    var guideimg = [["../images/web%file-word.png","../images/web%file-word-selected.png"],
+    ["../images/web%dice.png","../images/web%dice-selected.png"],
+    ["../images/web%home.png","../images/web%home-selected.png"]]
+    
+    if(frommobile==1)
+    {
+        var pccontainer = document.getElementsByClassName('pccontainer')[0]
+        pccontainer.setAttribute("hidden","true");
+    }
+    var flag = 1
+    $(function() {
+      $('#mybutton').bind('click', function() {
+        $.post($SCRIPT_ROOT + '/login', {
+            username: $('input[name="modal-username"]').val(),
+            password: $('input[name="modal-password"]').val()
+        }, function() {
+            location.reload()                           
+        });
+        return false;
+      });
+      $('#control-panel').bind('click', function() {
+        window.location.href = $SCRIPT_ROOT+'/controlcenter'
+      });
+    });
+    
+	var img1 = document.getElementById("guidelinkimg1")
+    var img2 = document.getElementById("guidelinkimg2")
+    var img3 = document.getElementById("guidelinkimg3")
+
+    $.ajax({
+        type: "get",
+        url: "/getguidbarjson",
+        async : false,
+        success: function (data) 
+        {
+            guidbarindex= data
+        }
+    });
+    console.log(guideimg)
+    console.log(guidbarindex)
+    img1.setAttribute("src",guideimg[0][guidbarindex["img1"]]);
+    img2.setAttribute("src",guideimg[1][guidbarindex["img2"]]);
+    img3.setAttribute("src",guideimg[2][guidbarindex["img3"]]);
+    
+    $('#guidelink1').bind('click',function(){
+    var data = 1
+    $.ajax({
+        type: "POST",
+        url: '/postguidbarjson',
+        async : false,
+        data: {'index':data},
+        success: function () {
+    }
+    }); 
+    })
+
+    $('#guidelink2').bind('click',function(){
+    var data = 2
+    $.ajax({
+        type: "POST",
+        url: '/postguidbarjson',
+        async : false,
+        data: {'index':data},
+        success: function () {
+    }
+    }); 
+    })
+
+
+    $('#guidelink3').bind('click',function(){
+    var data = 3
+    $.ajax({
+        type: "POST",
+        url: '/postguidbarjson',
+        async : false,
+        data: {'index':data},
+        success: function () {
+    }
+    }); 
+    })
+
+
+    
+	
+
+
+</script>
+
+</html>
