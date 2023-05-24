@@ -4,7 +4,6 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
 from flask import session as flask_session
-from sqlalchemy.orm import Bundle,aliased
 from sqlalchemy.sql import func
 import config
 Base = declarative_base()
