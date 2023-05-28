@@ -1,7 +1,7 @@
 from flask import Flask, jsonify,render_template, request,session,redirect,url_for,flash,g,send_file
 import config
 import database
-from blueprints import login_bp, mobile_information_bp, paper_bp,users_bp,information_bp,manage_bp
+from blueprints import login_bp, mobile_information_bp, paper_bp,users_bp,information_bp,manage_bp,file_bp
 from sqlalchemy import select
 from permission import Permissions,permission_required
 import os
@@ -17,9 +17,10 @@ app.register_blueprint(login_bp)
 app.register_blueprint(information_bp)
 app.register_blueprint(mobile_information_bp)
 app.register_blueprint(manage_bp)
+app.register_blueprint(file_bp)
 
 engine = database.engine
-logging.basicConfig(filename=datetime.datetime.now().strftime("%Y-%m-%d")+'.log',level=logging.DEBUG)
+#logging.basicConfig(filename=datetime.datetime.now().strftime("%Y-%m-%d")+'.log',level=logging.DEBUG)
 @app.before_request
 def before_function():
     userid = session.get('nl_user_id') 
@@ -71,10 +72,7 @@ def main():
             session['nl_user_id'] = login_user[0].userid
             return jsonify("refresh") '''
 
-@app.route('/<path:url_path>/<file_name>', methods=['GET']) #泛型
-def get_file(url_path,file_name):
-    file_path = os.path.join(url_path, file_name)
-    return send_file(file_path)
+
 
 # @app.route('/media/<file_name>', methods=['GET']) #泛型
 # def get_media(file_name):

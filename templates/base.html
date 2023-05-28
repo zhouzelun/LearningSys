@@ -89,21 +89,21 @@
         <ul>
             <li id="guidelink1">                                
                 <a  href="{{url_for('information.showreadarticlelist') }}" >
-                    <img id="guidelinkimg1" data="0"  src="../images/file-word.png" alt="">
+                    <img id="guidelinkimg1" data="0"  alt="">
                     <span>文章</span>
                 </a>
             </li>
 
             <li id="guidelink2">
                 <a class="guidelink" href="{{url_for('paper.showanserpaperlist') }}" >
-                    <img id="guidelinkimg2" data="0" src="../images/dice.png" alt="">
+                    <img id="guidelinkimg2" data="0"  alt="">
                     <span>答题</span>
                 </a>
             </li>
 
             <li id="guidelink3">
                 <a class="guidelink" href="{{url_for('users_bp.showusercenter') }}">
-                    <img id="guidelinkimg3" data="0" src="../images/home.png" alt="">
+                    <img id="guidelinkimg3" data="0" alt="">
                     <span>我的</span>
                 </a>
             </li>
@@ -144,9 +144,9 @@
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     frommobile = {{frommobile}};
     var guidbarindex = {"img1": 1, "img2": 0, "img3": 0}
-    var guideimg = [["../images/web%file-word.png","../images/web%file-word-selected.png"],
-    ["../images/web%dice.png","../images/web%dice-selected.png"],
-    ["../images/web%home.png","../images/web%home-selected.png"]]
+    var guideimg = [["../files/getfile/images/web/file-word.png","../files/getfile/images/web/file-word-selected.png"],
+    ["../files/getfile/images/web/dice.png","../files/getfile/images/web/dice-selected.png"],
+    ["../files/getfile/images/web/home.png","../files/getfile/images/web/home-selected.png"]]
     
     if(frommobile==1)
     {

@@ -5,16 +5,33 @@
 <script src="{{url_for('static',filename = 'richarea/tinymce.min.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
 <script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
+
+
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrapfileinput/css/fileinput.min.css')}}">
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/buffer.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/filetype.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/piexif.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/sortable.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/fileinput.min.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/js/locales/zh.js')}}"></script>
+<script src="{{url_for('static',filename = 'bootstrapfileinput/explorer-fa6/theme.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrapfileinput/explorer-fa6/theme.css')}}">
 <div class="container">
   <input type="text" id="information_title" style="font-size: xx-large;" class="form-control" placeholder="请输入标题"
-    aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg"/>
-    <div class="form-group row">
-      <div class="col-lg-10">
-        <select class="selectpicker show-tick" data-live-search="true" id="userdroplist" title="主持人" data-hide-disabled="true"></select>
-        <select id="departdroplist" class="selectpicker" data-live-search="true"  title="部门"></select>
-      
-      </div>
+    aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" />
+  <div class="form-group row">
+    <div class="col-lg-10">
+      <select class="selectpicker show-tick" data-live-search="true" id="userdroplist" title="主持人"
+        data-hide-disabled="true"></select>
+      <select id="departdroplist" class="selectpicker" data-live-search="true" title="部门"></select>
     </div>
+  </div>
+  <div class="file-loading">
+    <input id="filepreview" name="input-folder-3[]" type="file" multiple>
+  </div>
+  <div class="file-loading">
+    <input id="fileinput" name="input-folder-3[]" type="file" multiple>
+  </div>
   <form method="post">
     <textarea id="mytextarea"></textarea>
   </form>
@@ -24,21 +41,26 @@
       type="button">发布</button>
   </div>
 </div>
-<button id="progressmodalshowbtn"  type="button" hidden="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#progressmodal">
+<button id="progressmodalshowbtn" type="button" hidden="" class="btn btn-primary" data-bs-toggle="modal"
+  data-bs-target="#progressmodal">
 </button>
-<div id="progressmodal" style="z-index: 9999;" class="modal fade"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div id="progressmodal" style="z-index: 9999;" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-body">
-            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0"
-            aria-valuemax="100">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
-            <button id="progressmodalclosebtn" hidden = "" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-          </div>
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
+          aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+          <button id="progressmodalclosebtn" hidden="" type="button" class="btn btn-secondary"
+            data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
+    </div>
   </div>
 </div>
+
+
 
 <script type=text/javascript>
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -52,6 +74,9 @@ var myModal = document.getElementById('progressmodal')
 var modal = new bootstrap.Modal(myModal)
 var userlist = {{userlist|tojson}}
 var departlist = {{departmentlist|tojson}}
+var thelastfileconf={content:[],config:[]}
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 //$departdroplist.innerHTML = $departdroplist.innerHTML+("<option data-content='<span class=text>safasdfas</span>'></option>")
 
 function appenduserlistnode(item,index)
@@ -67,10 +92,6 @@ function appenddepartlistnode(item,index)
 }
 userlist.forEach(appenduserlistnode)
 departlist.forEach(appenddepartlistnode)
-
-
-
-
 
 /*const example_image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {//上传图片的函数 抄的= =
     const xhr = new XMLHttpRequest();
@@ -208,14 +229,22 @@ function fail(e) {
 
 $('#uploadbtn').bind('click',function(){
     var information_title = $('#information_title').val()
+    if(information_title==''){
+      alert('好歹起个标题啊！')
+      return
+    }
     var hostid = $userdroplist.options[$userdroplist.selectedIndex].value
     var departmentid = $departdroplist.options[$departdroplist.selectedIndex].value
-    
+    var filekeys=[]
+    $('#filepreview').fileinput('getPreview')['config'].forEach(function(item){
+      filekeys.push(item['key'])
+    })
     $.ajax({
         type: "POST",
         url: $SCRIPT_ROOT+'/information/savecontent',
         async : false,
-        data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':1},
+        data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'filekeys':filekeys,
+        'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':1},
         success: function () {
             window.location.href = '/information/articlelist'
         }
@@ -225,11 +254,22 @@ $('#uploadbtn').bind('click',function(){
 
 $('#savebtn').bind('click',function(){
   var information_title = $('#information_title').val()
+  if(information_title==''){
+    alert('好歹起个标题啊！')
+    return
+  }
+  var hostid = $userdroplist.options[$userdroplist.selectedIndex].value
+  var departmentid = $departdroplist.options[$departdroplist.selectedIndex].value
+  var filekeys=[]
+  $('#filepreview').fileinput('getPreview')['config'].forEach(function(item){
+    filekeys.push(item['key'])
+  })
   $.ajax({
       type: "POST",
       url: $SCRIPT_ROOT+'/information/savecontent',
       async : false,
-      data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':0},
+      data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'filekeys':filekeys,
+        'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':0},
       success: function () {
           window.location.href = '/information/articlelist'
       }
@@ -238,22 +278,78 @@ $('#savebtn').bind('click',function(){
 
 function initcontent(inst) {
   var msg={{ get_flashed_messages() | tojson }} ;
-  console.log(msg)
+  // console.log(msg)
   if(msg != ''){
     
     if( msg[0]['content'] != null){
-      console.log(msg[0]['content'])
+      // console.log(msg[0]['content'])
       inst.setContent(msg[0]['content'])
     }
+    
+    thelastfileconf= msg[0]['fileconfig']
+    
     $('#information_title').val(msg[0]['title'])
     window.article_id= msg[0]['article_id']
     $('#userdroplist').selectpicker('val', msg[0]['hostid']+'');
     $('#userdroplist').selectpicker('render');
     $('#departdroplist').selectpicker('val', msg[0]['departid']+'');
     $('#departdroplist').selectpicker('render');
-  }
-  
-  
+  }  
+  initfilepreview(thelastfileconf)
+}
+
+$(document).ready(function() {
+    initfileinput()
+    $('#fileinput').on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+      thelastfileconf = $('#fileinput').fileinput('getPreview')
+      previewconf = $('#filepreview').fileinput('getPreview')
+      thelastfileconf['content']=previewconf['content'].concat(thelastfileconf['content'])
+      thelastfileconf['config']=previewconf['config'].concat(thelastfileconf['config'])
+      $('#filepreview').fileinput('destroy')
+      initfilepreview(thelastfileconf)
+      $('#fileinput').fileinput('refresh')
+      
+    });
+ 
+});
+
+function initfileinput() {
+  $("#fileinput").fileinput({
+    language: 'zh', //设置语言
+    uploadUrl: "/files/uploadfile",
+    maxFileSize:1024*50,
+    allowedFileExtensions: ["docx", "doc", "xls", "xlsx","pdf","ppt","pptx"],
+    initialPreviewShowDelete:false,
+    dropZoneEnabled:false,
+    showClose:false,
+    // initialPreview: [
+    // '<i class="fas fa-file-pdf text-danger"></i>',    
+    // ],
+    initialPreviewAsData: false ,    // identify if you are sending preview data only and not the raw markup
+    // initialPreviewFileType: 'image', // image is the default and can be overridden in config below
+    // initialPreviewConfig: [
+    // {caption: "SampleXLSFile_38kb.jpg", url: "/files/deletefile", key: 5}
+    // ]
+  });
+}
+function initfilepreview(config) {
+  $("#filepreview").fileinput({
+    language: 'zh', //设置语言
+    theme:'explorer-fa6',
+    showUpload:false,
+    showCaption: false,
+    showRemove: false,
+    showUpload: false,
+    showBrowse:false,
+    showClose:false,
+    dropZoneEnabled:false,
+    reversePreviewOrder: true,
+    initialPreview: config['content'],
+    initialPreviewAsData: false ,    // identify if you are sending preview data only and not the raw markup
+    initialPreviewFileType: 'image', // image is the default and can be overridden in config below
+    initialPreviewConfig: config['config']
+  });
+  // console.log($('#filepreview').fileinput('getPreview'))
 }
 
 </script>

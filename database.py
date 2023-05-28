@@ -7,7 +7,8 @@ from flask import session as flask_session
 from sqlalchemy.sql import func
 import config
 Base = declarative_base()
-
+#alembic revision --autogenerate -m  "addfilemanagmentforecol";  
+#alembic upgrade head
 class Role(Base):
     __tablename__ = "ROLE"
     roleid = Column(Integer, primary_key=True)
@@ -90,6 +91,7 @@ class Article(Base):
     ownerid = Column(Integer, ForeignKey("USER.userid"), nullable=False)
     state = Column(CHAR)
     readrecords = relationship("ReadRecord", back_populates="article")
+    files = relationship("File", back_populates="article")
     def __repr__(self):
         return f"Article(article_id={self.article_id!r},title={self.title!r},content={self.content!r},ownerid={self.ownerid!r})"
 
@@ -106,11 +108,19 @@ class ScoreRecord(Base):
     articleid =Column(Integer,ForeignKey("ARTICLE.article_id"))
     insertdate = Column(DateTime)
 
-
 class Department(Base):
     __tablename__ = "DEPARTMENT"
     departmentid = Column(Integer, primary_key=True)
     departmentname =  Column(VARCHAR(100))
+
+class File(Base):
+    __tablename__ = "FILE"
+    fileid = Column(Integer, primary_key=True)
+    path =  Column(TEXT)
+    articleid=Column(Integer, ForeignKey("ARTICLE.article_id"))
+    article = relationship("Article", back_populates="files")
+    insertdate = Column(DateTime)
+
 
 engine = create_engine(config.DB_URI)
 
@@ -382,6 +392,8 @@ def drop_article(article_id):
 
 
 def insert_article(article_id,title,content,ownerid,state,hostid,departmentid):
+    if(hostid==''):hostid=None
+    if(departmentid==''):departmentid=None
     p = drop_article(article_id)
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with Session(engine) as session:
@@ -442,7 +454,8 @@ def get_all_article_bak():
         return result.scalars().all()
 #scalars()返回每个row对象的第一个元素
 def get_article_byid(article_id):
-    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).where(Article.article_id == article_id)
+    stmt = select(Article,func.count(ReadRecord.readid)).\
+        outerjoin(ReadRecord).where(Article.article_id == article_id)
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.all()
@@ -531,9 +544,39 @@ def unlockpaper(answerid): #作废试卷，删除积分记录
        #session.execute(stmt)
         session.commit()
 
+def deletefile(fileid): #删除文件
+    with Session(engine) as session:
+        file = session.query(File).filter_by(fileid=fileid).first()
+        if (file is not None):
+            session.delete(file)
+            session.commit()
+            return file
+    return None
 
+def insertfile(path):
+    now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with Session(engine) as session:
+        one_file = File(
+            path=path,
+            insertdate=now_time
+        ) 
+        session.add(one_file)
+        session.flush()
+        session.commit()
+        return one_file.fileid
 
-            
+def updatefile(fileid,articleid):
+    with Session(engine) as session:
+        stmt=update(File).where(File.fileid==fileid).values(articleid=articleid)
+        session.execute(stmt)
+        session.commit()
+
+def getfile_byarticleid(articleid):
+    stmt = select(File).where(File.articleid == articleid)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.scalars().all()
+    
     
 
 

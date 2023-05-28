@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)http://127.0.0.1:5000/files/uploadfile -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/bootstrap.min.css">
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/mystyle.css">
+  <script src="./405 Method Not Allowed_files/bootstrap.bundle.min.js"></script>
+  <script src="./405 Method Not Allowed_files/jquery.min.js"></script>
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/bootstrap_table_css.css">
+
+  <script src="./405 Method Not Allowed_files/bootstrap_table_js.js"></script>
+  <script src="./405 Method Not Allowed_files/bootstrap_table_zn_js.js"></script>
+  <script src="./405 Method Not Allowed_files/bootstrap-table-locale-all.min.js"></script>
+  <script src="./405 Method Not Allowed_files/tinymce.min.js"></script>
+
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/table_icon.css">
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/all.min.css">
+  <link rel="stylesheet" href="./405 Method Not Allowed_files/animate.css">
+
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark base_navbar" style="background-color: #e3f2fd;">
+    <div class="container-fluid">
+      <i class="fa-solid fa-splotch fa-2xl" style="color: #f8f9fc; margin-right:10px"></i>
+      <a class="navbar-brand" href="http://127.0.0.1:5000/">学习助手</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" hidden="true">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="http://127.0.0.1:5000/files/uploadfile#">学习</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://127.0.0.1:5000/paper/answerpaperlist">刷题</a>
+          </li>
+        </ul>
+      </div>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        
+        <button type="button" hidden="" class="btn btn-light animateclass" style="background: transparent; border:0ch; color: white" id="control-panel">用户界面</button>
+        
+        <div class="btn-group">
+          <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            周泽仑
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="http://127.0.0.1:5000/user/home">个人中心</a></li>
+          </ul>
+        </div>
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:5000/loginout">注销</a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+
+  <main class="d-flex flex-nowrap">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="height: 100vh;flex-shrink: 0;">
+      <a href="http://127.0.0.1:5000/createcenter" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <i class="fa-solid fa-hippo fa-xl"></i>&nbsp; &nbsp;
+        <span class="controlhead">发布中心</span>
+      </a>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto" id="ul_header">
+        <li class="nav-item">
+          <a href="http://127.0.0.1:5000/createcenter" class="nav-link text-white" aria-current="page">
+            <i class="fa-solid fa-home"></i>&nbsp;
+            主页
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="http://127.0.0.1:5000/information/articlelist" class="nav-link text-white" aria-current="page">
+            <i class="fa-solid fa-pencil"></i>&nbsp;
+            文章管理
+          </a>
+        </li>
+        <li>
+          <a href="http://127.0.0.1:5000/paper/list" class="nav-link text-white">
+            <i class="fa-solid fa-person-chalkboard"></i>
+            试题管理
+          </a>
+        </li>
+        <li>
+          <a href="http://127.0.0.1:5000/paper/unlockpaper" class="nav-link text-white">
+            <i class="fa-solid fa-hammer"></i>
+            试卷补考
+          </a>
+        </li>
+        <li>
+          <a href="http://127.0.0.1:5000/manage/insertscore" class="nav-link text-white">
+            <i class="fa-solid fa-syringe"></i>
+            积分管理
+          </a>
+        </li>
+        <li>
+          <a href="http://127.0.0.1:5000/files/uploadfile#" class="nav-link text-white">
+            <i class="fa-solid fa-user"></i>&nbsp;
+            用户管理
+          </a>
+        </li>
+      </ul>
+      <hr>
+    </div>
+    <div class="d-flex flex-column flex-shrink-0 p-3 " style="height: 100vh;flex-shrink: 0;width:86vw;">
+      
+      
+
+<link rel="stylesheet" href="./405 Method Not Allowed_files/fileinput.min.css">
+<script src="./405 Method Not Allowed_files/buffer.min.js"></script>
+<script src="./405 Method Not Allowed_files/filetype.min.js"></script>
+<script src="./405 Method Not Allowed_files/piexif.min.js"></script>
+<script src="./405 Method Not Allowed_files/sortable.min.js"></script>
+<script src="./405 Method Not Allowed_files/fileinput.min.js"></script>
+<script src="./405 Method Not Allowed_files/LANG.js"></script>
+
+<input type="text" id="learning_title" style="font-size: xx-large;" class="form-control" placeholder="请输入标题" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+<div class="file-input has-error"><div class="file-preview">
+  <button type="button" class="btn-close fileinput-remove" aria-label="Close">
+</button>  <div class=" file-drop-zone clearfix">
+    <div class="file-preview-thumbnails clearfix">
+    <div class="file-preview-frame krajee-default kv-preview-thumb file-preview-error" id="thumb-input-folder-3-16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx" data-fileindex="-1" data-fileid="16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx" data-filename="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx.xlsx" data-template="object" data-zoom="" title="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx"><div class="kv-file-content">
+<object class="kv-preview-data file-preview-object file-object type-default" data="blob:http://127.0.0.1:5000/3db66ae4-f5e7-4963-a6b4-1bd6e638c1e0" type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="width: 213px; height: 160px;">
+<param name="movie" value="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx">
+<param name="controller" value="true">
+<param name="allowFullScreen" value="true">
+<param name="allowScriptAccess" value="always">
+<param name="autoPlay" value="false">
+<param name="autoStart" value="false">
+<param name="quality" value="high">
+ <div class="file-preview-other">
+<span class="file-other-icon"><i class="bi-file-earmark-fill"></i></span>
+</div>
+</object>
+</div><div class="file-thumbnail-footer">
+    <div class="file-footer-caption" title="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx">
+        <div class="file-caption-info">同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx</div>
+        <div class="file-size-info"> <samp>(16.07 KB)</samp></div>
+    </div>
+    <div class="file-thumb-progress kv-hidden" style="display: block;"><div class="progress">
+    <div class="progress-bar bg-danger progress-bar-danger" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">Upload Error</div>
+</div></div>
+<div class="file-upload-indicator" title="Upload Error"><i class="bi-exclamation-lg text-danger"></i></div>
+<div class="file-actions">
+    <div class="file-footer-buttons">
+        <button type="button" class="kv-file-rotate btn btn-sm btn-kv btn-default btn-outline-secondary" title="Rotate 90 deg. clockwise"><i class="bi-arrow-clockwise"></i></button>  <button type="button" class="kv-file-upload btn btn-sm btn-kv btn-default btn-outline-secondary" title="Retry upload"><i class="bi-cloud-arrow-up-fill"></i></button> <button type="button" class="kv-file-remove btn btn-sm btn-kv btn-default btn-outline-secondary" title="Remove file"><i class="bi-trash"></i></button>
+ <button type="button" class="kv-file-zoom btn btn-sm btn-kv btn-default btn-outline-secondary" title="View Details"><i class="bi-zoom-in"></i></button>     </div>
+</div>
+
+<div class="clearfix"></div>
+</div>
+
+<div class="kv-zoom-cache"><div class="file-preview-frame krajee-default  kv-zoom-thumb" id="zoom-thumb-input-folder-3-16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx" data-fileindex="-1" data-fileid="16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx" data-filename="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx.xlsx" data-template="object" data-zoom="{zoomData}" title="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx"><div class="kv-file-content">
+<object class="kv-preview-data file-preview-object file-object type-default" data="blob:http://127.0.0.1:5000/3db66ae4-f5e7-4963-a6b4-1bd6e638c1e0" type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="width: 213px; height: 160px;">
+<param name="movie" value="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx">
+<param name="controller" value="true">
+<param name="allowFullScreen" value="true">
+<param name="allowScriptAccess" value="always">
+<param name="autoPlay" value="false">
+<param name="autoStart" value="false">
+<param name="quality" value="high">
+ <div class="file-preview-other">
+<span class="file-other-icon"><i class="bi-file-earmark-fill"></i></span>
+</div>
+</object>
+</div>
+</div>
+</div></div>
+</div>
+    <div class="file-preview-status text-center text-success"></div>
+    <div class="kv-fileinput-error file-error-message" style=""><button type="button" class="btn-close kv-error-close  float-end" aria-label="Close">
+</button><ul><li data-thumb-id="thumb-input-folder-3-16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx" data-file-id="16459__E5_90_8C_E9_87_8C_E6_A0_B8_E9_85_B8_E9_87_87_E9_9B_86_E8_80_83_E6_A0_B8_E7_99_BB_E8_AE_B0_E8_A1_A8-fudz-_E8_A1_A8_E5_8D_95_E5_8F_8D_E9_A6_88_E5_AF_BC_E5_87_BA_2022-05-02.xlsx"><b>同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx: </b>METHOD NOT ALLOWED<pre>
+<title>405 Method Not Allowed</title>
+<h1>Method Not Allowed</h1>
+<p>The method is not allowed for the requested URL.</p></pre></li></ul></div>
+  </div>
+</div>
+<div class="kv-upload-progress kv-hidden" style="display: block;"><div class="progress">
+    <div class="progress-bar bg-success progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+        Done
+     </div>
+</div></div><div class="clearfix"></div>
+<div class="file-caption icon-visible">
+  <div class="input-group ">
+      <input readonly="" class="file-caption-name form-control kv-fileinput-caption is-invalid" placeholder="选择的文件" title="同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02.xlsx">
+
+<span class="file-caption-icon"><i class="bi-file-earmark-arrow-up"></i></span>
+      <button type="button" title="Clear all unprocessed files" class="btn btn-default btn-outline-secondary fileinput-remove fileinput-remove-button" tabindex="500"><i class="bi-trash"></i>  <span class="hidden-xs">删除</span></button>
+      <button type="button" title="Abort ongoing upload" class="btn btn-default btn-outline-secondary kv-hidden fileinput-cancel fileinput-cancel-button" style="display: none;"><i class="bi-slash-circle"></i>  <span class="hidden-xs">Cancel</span></button>
+      
+      <a href="http://127.0.0.1:5000/files/uploadfile/uploadfile" title="Upload selected files" class="btn btn-default btn-outline-secondary fileinput-upload fileinput-upload-button" tabindex="500"><i class="bi-upload"></i>  <span class="hidden-xs">上传</span></a>
+      <div class="btn btn-primary btn-file" tabindex="500"><i class="bi-folder2-open"></i>   <span class="hidden-xs">选择文件</span><input id="input-folder-3" name="input-folder-3[]" type="file" multiple=""></div>
+  </div></div></div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#input-folder-3").fileinput({
+        uploadUrl: "uploadfile/uploadfile",
+        maxFilePreviewSize: 10240*5,
+        browseLabel: "选择文件",
+        uploadLabel: "上传",
+        removeLabel: "删除",
+        msgPlaceholder:"选择的文件",
+        dropZoneTitle:"文件"
+    });
+});
+
+</script>
+
+
+    </div>
+  </main>
+
+
+
+<script type="text/javascript">
+
+  $('#control-panel').bind('click', function() {
+    window.location.href = '/'
+  });
+  $(document).ready(function () {
+    // each 是 为每一个匹配的元素 执行定义的方法
+      $("#ul_header").find("a").each(function () {
+        // location.pathname 获取 当前浏览器上的url 地址
+        if ($(this).attr("href") === location.pathname) {
+          $(this).addClass("active");
+        } else {
+          $(this).removeClass("active");
+        }
+      });
+  
+  });
+
+</script><div id="kvFileinputModal" class="file-zoom-dialog modal fade" aria-labelledby="kvFileinputModalLabel" tabindex="-1"><div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    <div class="modal-header kv-zoom-header">
+      <h6 class="modal-title kv-zoom-title" id="kvFileinputModalLabel"><span class="kv-zoom-caption"></span> <span class="kv-zoom-size"></span></h6>
+      <div class="kv-zoom-actions"><button type="button" class="btn btn-sm btn-kv btn-default btn-outline-secondary btn-kv-rotate" title="Rotate 90 deg. clockwise"><i class="bi-arrow-clockwise"></i></button><button type="button" class="btn btn-sm btn-kv btn-default btn-outline-secondary btn-kv-toggleheader" title="Toggle header" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="bi-arrows-expand"></i></button><button type="button" class="btn btn-sm btn-kv btn-default btn-outline-secondary btn-kv-fullscreen" title="Toggle full screen" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="bi-arrows-fullscreen"></i></button><button type="button" class="btn btn-sm btn-kv btn-default btn-outline-secondary btn-kv-borderless" title="Toggle borderless mode" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="bi-arrows-angle-expand"></i></button><button type="button" class="btn btn-sm btn-kv btn-default btn-outline-secondary btn-kv-close" title="Close detailed preview" data-bs-dismiss="modal" aria-hidden="true"><i class="bi-x-lg"></i></button></div>
+    </div>
+    <div class="floating-buttons"></div>
+    <div class="kv-zoom-body file-zoom-content krajee-default"></div>
+<button type="button" class="btn btn-default btn-outline-secondary btn-navigate btn-kv-prev" title="View previous file"><i class="bi-chevron-left"></i></button> <button type="button" class="btn btn-default btn-outline-secondary btn-navigate btn-kv-next" title="View next file"><i class="bi-chevron-right"></i></button>
+    <div class="kv-zoom-description"></div>
+  </div>
+</div>
+</div></body></html>

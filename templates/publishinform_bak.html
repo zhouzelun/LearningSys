@@ -1,0 +1,259 @@
+{%extends "createcenter.html"%}
+
+{% block body %}
+
+<script src="{{url_for('static',filename = 'richarea/tinymce.min.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
+<script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
+<div class="container">
+  <input type="text" id="information_title" style="font-size: xx-large;" class="form-control" placeholder="请输入标题"
+    aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg"/>
+    <div class="form-group row">
+      <div class="col-lg-10">
+        <select class="selectpicker show-tick" data-live-search="true" id="userdroplist" title="主持人" data-hide-disabled="true"></select>
+        <select id="departdroplist" class="selectpicker" data-live-search="true"  title="部门"></select>
+      </div>
+    </div>
+  <form method="post">
+    <textarea id="mytextarea"></textarea>
+  </form>
+  <div class="btn-group" style="width:100%">
+    <button id="savebtn" class="btn btn-primary" style="background-color:gray;border:none" type="button">保存</button>
+    <button id="uploadbtn" class="btn btn-primary" style="background-color:#222f3e;border:none"
+      type="button">发布</button>
+  </div>
+</div>
+<button id="progressmodalshowbtn"  type="button" hidden="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#progressmodal">
+</button>
+<div id="progressmodal" style="z-index: 9999;" class="modal fade"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-body">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0"
+            aria-valuemax="100">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+            <button id="progressmodalclosebtn" hidden = "" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script type=text/javascript>
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+$progressbar = document.getElementsByClassName('progress-bar')[0]
+$progressmodalclosebtn = document.getElementById('progressmodalclosebtn')
+$progressmodalshowbtn = document.getElementById('progressmodalshowbtn')
+$userdroplist = document.getElementById('userdroplist')
+$departdroplist = document.getElementById('departdroplist')
+window.article_id= 0
+var myModal = document.getElementById('progressmodal')
+var modal = new bootstrap.Modal(myModal)
+var userlist = {{userlist|tojson}}
+var departlist = {{departmentlist|tojson}}
+//$departdroplist.innerHTML = $departdroplist.innerHTML+("<option data-content='<span class=text>safasdfas</span>'></option>")
+
+function appenduserlistnode(item,index)
+{
+  $userdroplist.innerHTML = $userdroplist.innerHTML+
+  ("<option value="+item['userid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['name']+"</span>'></option>")
+}
+
+function appenddepartlistnode(item,index)
+{
+  $departdroplist.innerHTML = $departdroplist.innerHTML+
+  ("<option value="+item['departmentid']+" data-tokens="+item['py']+" data-content='<span color=black>"+item['name']+"</span>'></option>")
+}
+userlist.forEach(appenduserlistnode)
+departlist.forEach(appenddepartlistnode)
+
+
+
+
+
+/*const example_image_upload_handler = (blobInfo, progress) => new Promise((resolve, reject) => {//上传图片的函数 抄的= =
+    const xhr = new XMLHttpRequest();
+    xhr.withCredentials = false;
+    xhr.open('POST', 'uploadimage');
+    
+    xhr.upload.onprogress = (e) => {
+      progress(e.loaded / e.total * 100);
+    };
+  
+    xhr.onload = () => {
+      if (xhr.status === 403) {
+        reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+        return;
+      }
+  
+      if (xhr.status < 200 || xhr.status >= 300) {
+        reject('HTTP Error: ' + xhr.status);
+        return;
+      }
+  
+      const json = JSON.parse(xhr.responseText);
+  
+      if (!json || typeof json.location != 'string') {
+        reject('Invalid JSON: ' + xhr.responseText);
+        return;
+      }
+      
+      resolve(json.location);
+    };
+  
+    xhr.onerror = () => {
+      reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+    };
+  
+    const formData = new FormData();
+    formData.append('file', blobInfo.blob(), blobInfo.filename());
+  
+    xhr.send(formData);
+  });*/
+
+  //获取内容：tinyMCE.activeEditor.getContent()
+  //设置内容：tinyMCE.activeEditor.setContent(“需要设置的编辑器内容”)
+tinymce.init({
+    selector: '#mytextarea',
+    language:'zh-Hans',
+    skin: 'oxide-dark',
+    height: 600,
+    promotion: false,
+    plugins : 'media table image',
+    image_uploadtab:false,
+    menubar: 'edit format ',
+    font_family_formats: "微软雅黑='微软雅黑';宋体='宋体';黑体='黑体';仿宋='仿宋';楷体='楷体';隶书='隶书';幼圆='幼圆;Times New Roman=times new roman'",
+    toolbar: 'undo redo |image media table|fontfamily fontsize forecolor bold underline italic |styleselec|aligncenter alignjustify alignleft alignright',
+    //images_upload_handler: example_image_upload_handler,
+    statusbar: false,
+    init_instance_callback:initcontent,
+    contextmenu: "copy paste cut",
+    file_picker_callback: function (callback, value, meta) {
+        //文件分类
+        console.log(meta)
+        var filetype='';
+        //后端接收上传文件的地址
+        var upurl='/demo/upfile.php';
+        //为不同插件指定文件类型及后端地址
+        switch(meta.filetype){
+            case 'image':
+                filetype='.jpg, .jpeg, .png, .gif';
+                upurl='uploadimage';
+                break;
+            case 'media':
+                filetype='.mp4, .flv, .avi';
+                upurl='uploadmedia';
+                break;
+            case 'file':
+            default:
+        }
+        //模拟出一个input用于添加本地文件
+        var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', filetype);
+        input.click();
+        input.onchange = function() {
+            var file = this.files[0];
+
+            var xhr, formData;
+            console.log(file.name);
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', upurl);
+            xhr.onload = function(e) {
+                var json;
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+                json = JSON.parse(xhr.responseText);
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+                callback(json.location);
+                console.log("成功" + e.currentTarget.responseText);
+                setTimeout(() => {
+                  modal.hide()
+                }, 1000);
+            };
+            formData = new FormData();
+            formData.append('file', file, file.name );
+            xhr.upload.onprogress = progressFunction;
+            xhr.onerror = fail;
+            modal.show()
+            xhr.send(formData);
+            
+        };
+    },
+    
+});
+
+function progressFunction(e) {
+  if (e.lengthComputable) {
+    // 获取百分制的进度
+    percent = Math.round(e.loaded / e.total * 100);
+    $progressbar.setAttribute('style','width:'+percent+'%')
+  }
+}
+
+// 上传成功
+function success(e) {}
+
+// 上传失败
+function fail(e) {
+  alert("上传失败：" + e);
+}
+
+$('#uploadbtn').bind('click',function(){
+    var information_title = $('#information_title').val()
+    var hostid = $userdroplist.options[$userdroplist.selectedIndex].value
+    var departmentid = $departdroplist.options[$departdroplist.selectedIndex].value
+    
+    $.ajax({
+        type: "POST",
+        url: $SCRIPT_ROOT+'/information/savecontent',
+        async : false,
+        data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':1},
+        success: function () {
+            window.location.href = '/information/articlelist'
+        }
+    });
+})
+
+
+$('#savebtn').bind('click',function(){
+  var information_title = $('#information_title').val()
+  $.ajax({
+      type: "POST",
+      url: $SCRIPT_ROOT+'/information/savecontent',
+      async : false,
+      data: {'article_id':window.article_id,'hostid':hostid,'departid':departmentid,'title':information_title,"content":tinyMCE.activeEditor.getContent(),'state':0},
+      success: function () {
+          window.location.href = '/information/articlelist'
+      }
+  });
+})
+
+function initcontent(inst) {
+  var msg={{ get_flashed_messages() | tojson }} ;
+  console.log(msg)
+  if(msg != ''){
+    
+    if( msg[0]['content'] != null){
+      console.log(msg[0]['content'])
+      inst.setContent(msg[0]['content'])
+    }
+    $('#information_title').val(msg[0]['title'])
+    window.article_id= msg[0]['article_id']
+    $('#userdroplist').selectpicker('val', msg[0]['hostid']+'');
+    $('#userdroplist').selectpicker('render');
+    $('#departdroplist').selectpicker('val', msg[0]['departid']+'');
+    $('#departdroplist').selectpicker('render');
+  }
+  
+  
+}
+
+</script>
+{% endblock %}

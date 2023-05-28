@@ -2,13 +2,12 @@ from flask import Blueprint, render_template,request,redirect,flash
 from permission import Permissions,permission_required
 from flask import current_app,jsonify,session,g
 from database import insert_article,get_all_article,get_article_byid,\
-delete_article,insert_readrecord,get_user_readrecord,get_all_article_filterbystate,get_alluser,get_alldepartment,\
-    insert_scorerecord,user_hasread,drop_article,get_all_article_filterbystate_user
-import shutil
+insert_readrecord,get_user_readrecord,get_all_article_filterbystate,get_alluser,get_alldepartment,\
+user_hasread,drop_article,get_all_article_filterbystate_user,updatefile,getfile_byarticleid
 import os
 from selectolax.parser import HTMLParser
 import pypinyin
-a = pypinyin.pinyin ( '姓名', style=pypinyin.FIRST_LETTER)
+
 bp = Blueprint("information",__name__,url_prefix="/information")
 
 
@@ -44,7 +43,7 @@ def uploadimage():
      fp=os.path.join(imageFolder,fname)
      myimage.save(fp)
      data={
-          "location": '../images/'+fname
+          "location": '../files/getfile/images/'+fname
      }  
      return jsonify(data)
 
@@ -56,7 +55,7 @@ def uploadfile():
      fp=os.path.join(imageFolder,fname)
      myimage.save(fp)
      data={
-          "location": '../media/'+fname
+          "location": '../files/getfile/media/'+fname
      }  
      return jsonify(data)
 
@@ -68,11 +67,14 @@ def savecontent():
     state = request.form['state']
     hostid = request.form['hostid']
     departid = request.form['departid']
+    filekeys = request.values.getlist('filekeys[]')
     if(g.user is not None):
          article_id=insert_article(article_id,title,content,session.get('nl_user_id'),state,hostid,departid)
     else:
          article_id=insert_article(article_id,title,content,0,state,hostid,departid)
     #insert_scorerecord(session.get('nl_user_id'),0,2,0,2,articleid=article_id)
+    for key in filekeys:
+        updatefile(key,article_id)
     return render_template('articlelist.html')
 
 
@@ -146,8 +148,24 @@ def articleSimpleData():
 def editarticle():
     article_id = request.args.get("article_id")
     article = get_article_byid(article_id)[0]
+    fileconfig={'config':[],'content':[]}
+    files = getfile_byarticleid(article_id)
+    for file in files:
+        fname = file.path.split('/')[-1]
+        file_type=['word','primary']
+        if fname.split('.')[-1] == 'doc' or fname.split('.')[-1] == 'docx':
+            file_type=['word','primary']
+        elif fname.split('.')[-1] == 'xls' or fname.split('.')[-1] == 'xlsx':
+            file_type=['excel','success']
+        elif fname.split('.')[-1] == 'ppt' or fname.split('.')[-1] == 'pptx':
+            file_type=['powerpoint','danger']
+        elif fname.split('.')[-1] == 'pdf':
+            file_type=['pdf','danger']
+        fileconfig['content'].append('<i class="fas fa-file-{} fa-2xl text-{}"></i>'.format(file_type[0],file_type[1]))
+        fileconfig['config'].append({'caption':fname,'url':'/files/deletefile','type':'image','key':file.fileid})
     article_data={'article_id' : article_id,'title':article[0].title,'content':article[0].content,\
-                  'hostid':article[0].hostid,'departid':article[0].departmentid}
+                  'hostid':article[0].hostid,'departid':article[0].departmentid,'fileconfig':fileconfig}
+
     flash(article_data)
     users = get_alluser()
     userlist = []
