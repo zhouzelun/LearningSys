@@ -1,5 +1,6 @@
-from flask import Blueprint,render_template,g,flash,jsonify
-from database import get_user_scores,get_user_answerrecord,get_paper_byid,get_user_bysession,get_user_readrecord,get_article_byid
+from flask import Blueprint,render_template,g,flash,jsonify,request,session,redirect
+from database import get_user_scores,get_user_answerrecord,get_paper_byid,get_user_bysession,get_user_readrecord,\
+    get_article_byid,alterpassword
 from permission import Permissions,permission_required
 bp = Blueprint("users_bp",__name__,url_prefix="/user")
 
@@ -24,6 +25,16 @@ def showusercenter():
     return render_template("usercenter.html")
 
 
+@bp.route("/alterpassword",methods=['GET', 'POST'])
+@permission_required(Permissions.USER_PERMISSION)
+def alteruserpassword():
+    if request.method == 'GET':
+        return render_template("alterpassword.html")
+    elif request.method == 'POST':
+        repeatnewpass = request.form.get('repeatnewpass')
+        newpass = request.form.get('newpass')
+        flag = alterpassword(session.get('nl_user_id'),newpass)
+        return redirect('/loginout')
 
 @bp.route('/answerdata',methods=['GET', 'POST'])
 @permission_required(Permissions.USER_PERMISSION)

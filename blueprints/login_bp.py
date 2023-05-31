@@ -20,11 +20,11 @@ def login():
         loginpassword=form.password.data
         login_user = database.get_user_byloginname(loginname)
         if login_user is None:
-            flash('该用户不存在')
-            return render_template("login.html")
+            message = '该用户不存在'
+            return render_template("login.html",message=message)
         elif login_user[0].password != loginpassword:
-            flash('账号密码不匹配')
-            return render_template("login.html")
+            message = '账号密码不匹配'
+            return render_template("login.html",message=message)
         else:
             session['nl_user_id'] = login_user[0].userid
             return redirect(request.referrer or "/")

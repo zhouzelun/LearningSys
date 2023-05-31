@@ -1,9 +1,11 @@
 
-from flask import Blueprint, render_template,request,redirect,flash,jsonify,send_file,g
+from flask import Blueprint, render_template,request,send_file,g
 import os
 from datetime import datetime
 import json
 from database import deletefile,insertfile
+
+
 bp = Blueprint("files",__name__,url_prefix="/files")
 
 
@@ -24,16 +26,21 @@ def uploadfile():
             fname = '_'+fname
             fp=os.path.join(fileFolder,fname)
         file_type=''  #判断文件格式，给前端返回不同的图标
+        type = 0
         if fname.split('.')[-1] == 'doc' or fname.split('.')[-1] == 'docx':
             file_type=['word','primary']
+            type=0
         elif fname.split('.')[-1] == 'xls' or fname.split('.')[-1] == 'xlsx':
             file_type=['excel','success']
+            type=1
         elif fname.split('.')[-1] == 'ppt' or fname.split('.')[-1] == 'pptx':
             file_type=['powerpoint','danger']
+            type=2
         elif fname.split('.')[-1] == 'pdf':
             file_type=['pdf','danger']
+            type=3
         one_file.save(fp)  
-        fileid = insertfile(fp)
+        fileid = insertfile(fp,type)
         responsedata = {
             'initialPreview': ['<i class="fas fa-file-{} fa-2xl text-{}"></i>'.format(file_type[0],file_type[1])],
             'append': True ,
@@ -54,6 +61,9 @@ def postdeletefile():
     }
     d = json.dumps(responsedata)
     return d
+
+
+
 
 @bp.route('getfile/<path:url_path>/<file_name>', methods=['GET']) #泛型
 def get_file(url_path,file_name):

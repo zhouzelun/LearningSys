@@ -5,8 +5,6 @@
 <script src="{{url_for('static',filename = 'richarea/tinymce.min.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrap-select/css/bootstrap-select.css')}}">
 <script src="{{url_for('static',filename = 'bootstrap-select/js/bootstrap-select.js')}}"></script>
-
-
 <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrapfileinput/css/fileinput.min.css')}}">
 <script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/buffer.min.js')}}"></script>
 <script src="{{url_for('static',filename = 'bootstrapfileinput/js/plugins/filetype.min.js')}}"></script>
@@ -16,6 +14,9 @@
 <script src="{{url_for('static',filename = 'bootstrapfileinput/js/locales/zh.js')}}"></script>
 <script src="{{url_for('static',filename = 'bootstrapfileinput/explorer-fa6/theme.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static',filename = 'bootstrapfileinput/explorer-fa6/theme.css')}}">
+
+
+
 <div class="container">
   <input type="text" id="information_title" style="font-size: xx-large;" class="form-control" placeholder="请输入标题"
     aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" />
@@ -296,6 +297,7 @@ function initcontent(inst) {
     $('#departdroplist').selectpicker('render');
   }  
   initfilepreview(thelastfileconf)
+  
 }
 
 $(document).ready(function() {
@@ -310,7 +312,8 @@ $(document).ready(function() {
       $('#fileinput').fileinput('refresh')
       
     });
- 
+    
+
 });
 
 function initfileinput() {

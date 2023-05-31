@@ -118,6 +118,7 @@ class File(Base):
     fileid = Column(Integer, primary_key=True)
     path =  Column(TEXT)
     articleid=Column(Integer, ForeignKey("ARTICLE.article_id"))
+    type=Column(CHAR) #0 word 1 excel 2 ppt 3 pdf 
     article = relationship("Article", back_populates="files")
     insertdate = Column(DateTime)
 
@@ -126,58 +127,164 @@ engine = create_engine(config.DB_URI)
 
 Base.metadata.create_all(engine)
 
-def get_alluser():    
+def get_alluser():    #获取所有用户
     with Session(engine) as session:
         stmt = select(User)
         result =  session.execute(stmt)
         return result.scalars().all()
 
 
-def get_user_byid(id):    
+def get_user_byid(id):    #通过id获取用户
     with Session(engine) as session:
         stmt = select(User).where(User.userid==id)
         result =  session.execute(stmt)
         login_user = result.first()
         return login_user
 
-def get_user_byloginname(loginname):    
+def get_user_byloginname(loginname):      #通过工号workid获取用户
     with Session(engine) as session:
         stmt = select(User).where(User.workid==loginname)
         result =  session.execute(stmt)
         login_user = result.first()
         return login_user
 
-def get_all_paper():             
+def get_all_paper():              #获取所有试卷
     stmt = select(Paper)
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.scalars().all()
     
-def get_all_paper_filterbystate(statelist):             
+def get_all_paper_filterbystate(statelist):         #根据试卷状态获取    
     stmt = select(Paper).where(Paper.state.in_(statelist))
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.scalars().all()
     
-def get_all_paper_filterbystate_user(statelist,ownerid):             
+def get_all_paper_filterbystate_user(statelist,ownerid):       #根据试卷状态和拥有者的id获取试卷         
     stmt = select(Paper).where(Paper.state.in_(statelist),Paper.ownerid==ownerid)
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.scalars().all()
 
-def get_paper_byid(paper_id):
+def get_paper_byid(paper_id):   #根据试卷id获取试卷
     stmt = select(Paper).where(Paper.paperid == paper_id)
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.scalars().all()
 
-def get_paper_questions_byid(paper_id):
+def get_paper_questions_byid(paper_id):   #获取question 根据试卷id
     stmt = select(Question).where(Question.paperid == paper_id)
     with Session(engine) as session:
         result =  session.execute(stmt)
         return result.scalars().all()
 
-def delete_paper(paper_id):
+
+
+def get_role_byuser(current_user): #根据现在用户获取他的角色
+    role_id=2                      #默认为匿名用的id
+    if(current_user is not None):
+        role_id = current_user.roleid
+    with Session(engine) as session:
+        role = session.query(Role).filter_by(roleid=role_id).first()
+        return role
+
+def get_user_bysession():     #直接根据session里的id获取用户
+    with Session(engine) as session:
+        u = session.query(User).filter_by(userid=flask_session.get('nl_user_id')).first()
+        return u
+
+def get_user_scores(id):     #根据用户的id获取该用户所有的积分
+    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
+    stmt = select(func.sum(ScoreRecord.score_1).label("score1"),func.sum(ScoreRecord.score_2).label("score2"),func.sum(ScoreRecord.score_3).label("score3")).filter_by(userid=id)
+    with Session(engine) as session:
+        result =  session.execute(stmt).all()
+        return result
+
+def get_user_answerrecord(id):    #根据用户的id获取该用户所有的答题记录
+    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
+    stmt = select(AnswerRecord,ScoreRecord).filter_by(userid=id).filter(AnswerRecord.state != 2)\
+        .outerjoin(ScoreRecord)\
+        .order_by(AnswerRecord.insertdate.desc())
+    with Session(engine) as session:
+        result =  session.execute(stmt).all()
+        return result
+
+def get_answerrecord_bypaper(id):#根据试卷id获取试卷的答题记录
+    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
+    stmt = select(AnswerRecord,User).filter_by(paperid=id).filter(AnswerRecord.state != 2)\
+        .outerjoin(User)\
+        .order_by(AnswerRecord.insertdate.desc())
+    with Session(engine) as session:
+        result =  session.execute(stmt).all()
+        return result
+    
+def get_user_readrecord(id):      #根据用户的id获取该用户所有的阅读记录
+    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
+    stmt = select(ReadRecord,ScoreRecord).filter_by(userid=id)\
+        .outerjoin(ScoreRecord)\
+        .order_by(ReadRecord.insertdate.desc())
+    with Session(engine) as session:
+        result =  session.execute(stmt).all()
+        return result
+    
+def get_all_readrecord():     #获取所有的阅读记录
+#stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
+    stmt = select(ReadRecord)
+    with Session(engine) as session:
+        result =  session.execute(stmt).scalars().all()
+        return result
+
+
+def get_all_article():     #获取所有的文章
+    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).group_by(Article.article_id)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.all()
+    
+def get_all_article_filterbystate():      #筛选已发布的文章
+    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).where(Article.state==1).group_by(Article.article_id)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.all()
+    
+
+def get_all_article_filterbystate_user(ownerid):     #根据所有者筛选文章
+    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).\
+        where(Article.state==1,Article.ownerid==ownerid).group_by(Article.article_id)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.all()
+    
+def get_all_article_bak():    
+    stmt = select(Article)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.scalars().all()
+    
+#scalars()返回每个row对象的第一个元素
+def get_article_byid(article_id): #根据文章id返回文章
+    stmt = select(Article,func.count(ReadRecord.readid)).\
+        outerjoin(ReadRecord).where(Article.article_id == article_id)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.all()
+
+def getfile_byarticleid(articleid):#根据文章id返回文章下的所有文件
+    stmt = select(File).where(File.articleid == articleid)
+    with Session(engine) as session:
+        result =  session.execute(stmt)
+        return result.scalars().all()
+    
+    
+def get_alldepartment():#获取所有部门
+    with Session(engine) as session:
+        stmt = select(Department)
+        result =  session.execute(stmt)
+        return result.scalars().all()
+    
+
+
+def delete_paper(paper_id):#直接删除试卷
     with Session(engine) as session:
         paper = session.query(Paper).filter_by(paperid=paper_id).first()
         if (paper is not None):
@@ -186,14 +293,14 @@ def delete_paper(paper_id):
             return paper
     return None
 
-def drop_paper(paper_id):
+def drop_paper(paper_id):#改试卷状态作废
     with Session(engine) as session:
         stmt=update(Paper).where(Paper.paperid==paper_id).values(state=2)
         session.execute(stmt)
         paper = session.query(Paper).filter_by(paperid=paper_id).first()
         return paper
 
-def delete_question_bypaperid(paper_id):
+def delete_question_bypaperid(paper_id):#删除题目
     with Session(engine) as session:
         Questions = session.query(Question).filter_by(paperid=paper_id)
         if (Questions is not None):
@@ -202,7 +309,7 @@ def delete_question_bypaperid(paper_id):
             session.commit()
 
 
-def insert_question(paper_id,type,detail,mark):
+def insert_question(paper_id,type,detail,mark):#插入题目
     with Session(engine) as session:
         one_question = Question(
                 paperid = paper_id,
@@ -213,7 +320,7 @@ def insert_question(paper_id,type,detail,mark):
         session.add_all([one_question])
         session.commit()
 
-def insert_paper(_paper_title,paper_id,count,paper_state,_ownerid,_questions,hostid,departmentid):
+def insert_paper(_paper_title,paper_id,count,paper_state,_ownerid,_questions,hostid,departmentid):#插入试卷
     p = drop_paper(paper_id)#先把试卷作废 state变成2 主要判断是否是None
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with Session(engine) as session:
@@ -258,7 +365,7 @@ def insert_paper(_paper_title,paper_id,count,paper_state,_ownerid,_questions,hos
             session.commit()
     return True  
 
-def drop_answerrecord(paper_id:int,user_id:int):
+def drop_answerrecord(paper_id:int,user_id:int): #作废回答记录 用于解锁用户的答题
     with Session(engine) as session:
         stmt=update(AnswerRecord).where(AnswerRecord.paperid==paper_id,AnswerRecord.userid==user_id).values(state=2)
         session.execute(stmt)
@@ -268,7 +375,7 @@ def drop_answerrecord(paper_id:int,user_id:int):
 
 
 
-def insert_record(paper_id,user_id,state,getmark):
+def insert_record(paper_id,user_id,state,getmark): #插入答题记录
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with Session(engine) as session:
         one_record = session.query(AnswerRecord).filter_by(paperid=int(paper_id),userid=user_id).filter(AnswerRecord.state!=2).first()
@@ -301,7 +408,7 @@ def insert_record(paper_id,user_id,state,getmark):
     return True
 
 
-def insert_readrecord(article_id,user_id):
+def insert_readrecord(article_id,user_id): #插入阅读记录
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     with Session(engine) as session:
@@ -318,62 +425,7 @@ def insert_readrecord(article_id,user_id):
         return one_record.readid  
 
 
-def get_role_byuser(current_user):
-    role_id=2                      #默认为匿名用的id
-    if(current_user is not None):
-        role_id = current_user.roleid
-    with Session(engine) as session:
-        role = session.query(Role).filter_by(roleid=role_id).first()
-        return role
-
-def get_user_bysession():
-    with Session(engine) as session:
-        u = session.query(User).filter_by(userid=flask_session.get('nl_user_id')).first()
-        return u
-
-def get_user_scores(id):
-    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
-    stmt = select(func.sum(ScoreRecord.score_1).label("score1"),func.sum(ScoreRecord.score_2).label("score2"),func.sum(ScoreRecord.score_3).label("score3")).filter_by(userid=id)
-    with Session(engine) as session:
-        result =  session.execute(stmt).all()
-        return result
-
-def get_user_answerrecord(id):
-    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
-    stmt = select(AnswerRecord,ScoreRecord).filter_by(userid=id).filter(AnswerRecord.state != 2)\
-        .outerjoin(ScoreRecord)\
-        .order_by(AnswerRecord.insertdate.desc())
-    with Session(engine) as session:
-        result =  session.execute(stmt).all()
-        return result
-
-def get_answerrecord_bypaper(id):
-    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
-    stmt = select(AnswerRecord,User).filter_by(paperid=id).filter(AnswerRecord.state != 2)\
-        .outerjoin(User)\
-        .order_by(AnswerRecord.insertdate.desc())
-    with Session(engine) as session:
-        result =  session.execute(stmt).all()
-        return result
-    
-def get_user_readrecord(id):
-    #stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
-    stmt = select(ReadRecord,ScoreRecord).filter_by(userid=id)\
-        .outerjoin(ScoreRecord)\
-        .order_by(ReadRecord.insertdate.desc())
-    with Session(engine) as session:
-        result =  session.execute(stmt).all()
-        return result
-    
-def get_all_readrecord():
-#stmt = select(AnswerRecord.userid,func.sum(AnswerRecord.score).label("scores")).group_by(AnswerRecord.userid)
-    stmt = select(ReadRecord)
-    with Session(engine) as session:
-        result =  session.execute(stmt).scalars().all()
-        return result
-
-
-def delete_article(article_id):
+def delete_article(article_id): #删除文章
     with Session(engine) as session:
         article = session.query(Article).filter_by(article_id=article_id).first()
         if (article is not None):
@@ -382,16 +434,17 @@ def delete_article(article_id):
             return article
     return None
 
-def drop_article(article_id):
+def drop_article(article_id):#作废文章
     with Session(engine) as session:
         with Session(engine) as session:
             stmt=update(Article).where(Article.article_id==article_id).values(state=2)
             session.execute(stmt)
             article = session.query(Article).filter_by(article_id=article_id).first()
+            session.commit()
             return article
 
 
-def insert_article(article_id,title,content,ownerid,state,hostid,departmentid):
+def insert_article(article_id,title,content,ownerid,state,hostid,departmentid): #插入文章
     if(hostid==''):hostid=None
     if(departmentid==''):departmentid=None
     p = drop_article(article_id)
@@ -427,40 +480,6 @@ def insert_article(article_id,title,content,ownerid,state,hostid,departmentid):
             session.commit()
     return article_id  
 
-def get_all_article():    
-    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).group_by(Article.article_id)
-    with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.all()
-    
-def get_all_article_filterbystate():    
-    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).where(Article.state==1).group_by(Article.article_id)
-    with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.all()
-    
-
-def get_all_article_filterbystate_user(ownerid):    
-    stmt = select(Article,func.count(ReadRecord.readid)).outerjoin(ReadRecord).\
-        where(Article.state==1,Article.ownerid==ownerid).group_by(Article.article_id)
-    with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.all()
-    
-def get_all_article_bak():    
-    stmt = select(Article)
-    with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.scalars().all()
-#scalars()返回每个row对象的第一个元素
-def get_article_byid(article_id):
-    stmt = select(Article,func.count(ReadRecord.readid)).\
-        outerjoin(ReadRecord).where(Article.article_id == article_id)
-    with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.all()
-
-
 #判断积分是否被加过，用来避免看文章或者答题重复积分
 def hasrecordscore(userid,comefrom,readid=None,answerid=None,articleid=None):
     stmt = select(ScoreRecord).where(\
@@ -476,7 +495,7 @@ def hasrecordscore(userid,comefrom,readid=None,answerid=None,articleid=None):
         else:
             return True
 
-
+#插入积分
 def insert_scorerecord(userid,score1,score2,score3,comefrom,readid=None,answerid=None,articleid=None):
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with Session(engine) as session:
@@ -513,13 +532,6 @@ def new_scorerecord(userid,score1,score2,score3,comefrom,readid=None,answerid=No
     return one_record
 
 
-def get_alldepartment():
-    with Session(engine) as session:
-        stmt = select(Department)
-        result =  session.execute(stmt)
-        return result.scalars().all()
-    
-
 def user_hasread(userid,articleid):  #判断文章是否被阅读了
     stmt = select(ReadRecord).filter_by(userid=userid,articleid=articleid)
     with Session(engine) as session:
@@ -553,31 +565,39 @@ def deletefile(fileid): #删除文件
             return file
     return None
 
-def insertfile(path):
+
+#插入文章对象
+def insertfile(path,_type):
     now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with Session(engine) as session:
         one_file = File(
             path=path,
-            insertdate=now_time
+            insertdate=now_time,
+            type=_type
         ) 
         session.add(one_file)
         session.flush()
         session.commit()
         return one_file.fileid
 
+#更新文章 设置文章对应的文章id
 def updatefile(fileid,articleid):
     with Session(engine) as session:
         stmt=update(File).where(File.fileid==fileid).values(articleid=articleid)
         session.execute(stmt)
         session.commit()
 
-def getfile_byarticleid(articleid):
-    stmt = select(File).where(File.articleid == articleid)
+def alterpassword(userid,newpass):
     with Session(engine) as session:
-        result =  session.execute(stmt)
-        return result.scalars().all()
-    
-    
+        #user = session.query(User).where(User.userid==userid).first()
+        #if user.password == oldpass:
+        stmt=update(User).where(User.userid==userid).values(password=newpass)
+        session.execute(stmt)
+        session.commit()
+        return True
+            
+        
+
 
 
     

@@ -7,7 +7,8 @@ user_hasread,drop_article,get_all_article_filterbystate_user,updatefile,getfile_
 import os
 from selectolax.parser import HTMLParser
 import pypinyin
-
+from urllib.parse import quote
+import base64
 bp = Blueprint("information",__name__,url_prefix="/information")
 
 
@@ -153,13 +154,13 @@ def editarticle():
     for file in files:
         fname = file.path.split('/')[-1]
         file_type=['word','primary']
-        if fname.split('.')[-1] == 'doc' or fname.split('.')[-1] == 'docx':
+        if file.type == '0':
             file_type=['word','primary']
-        elif fname.split('.')[-1] == 'xls' or fname.split('.')[-1] == 'xlsx':
+        elif file.type == '1':
             file_type=['excel','success']
-        elif fname.split('.')[-1] == 'ppt' or fname.split('.')[-1] == 'pptx':
+        elif file.type == '2':
             file_type=['powerpoint','danger']
-        elif fname.split('.')[-1] == 'pdf':
+        elif file.type == '3':
             file_type=['pdf','danger']
         fileconfig['content'].append('<i class="fas fa-file-{} fa-2xl text-{}"></i>'.format(file_type[0],file_type[1]))
         fileconfig['config'].append({'caption':fname,'url':'/files/deletefile','type':'image','key':file.fileid})
@@ -200,14 +201,31 @@ def showreadarticlelist():
 @bp.route('/article', methods=['GET'])
 @permission_required(Permissions.MANAGEMENT_PERMISSION)
 def showarticle():
+    hosturl = request.host_url
+    filepreviewurl =request.host_url.replace('5000', '8012')
     article_id = request.args.get("article_id")
     article = get_article_byid(article_id)[0]
+    files = getfile_byarticleid(article_id)
+    filelist = []
     
+    for index,file in enumerate(files):
+        f={}
+        f['index']=index
+        f['fname']=file.path.split('/')[-1]
+        # laststr = base64.b64encode((hosturl+"/files/getfile/"+file.path).encode())
+        f['url']=file.path
+        match file.type:
+            case '0':f['type']=['word','primary']
+            case '1':f['type']=['excel','success']
+            case '2':f['type']=['powerpoint','danger']
+            case '3':f['type']=['pdf','danger']
+        filelist.append(f)
     if(article[0].modifytime is None):
         article[0].modifytime = article[0].createtime.strftime("%Y-%m-%d %H:%M:%S")
     else:
         article[0].modifytime = article[0].modifytime.strftime("%Y-%m-%d %H:%M:%S")
-    return render_template('article_page.html',article=article[0],readcountnum = article[1])
+    return render_template('article_page.html',article=article[0],readcountnum = article[1],\
+                filelist=filelist,hosturl=hosturl,filepreviewurl=filepreviewurl)
 
 
 @bp.route('/recordread', methods=['post'])

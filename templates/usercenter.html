@@ -42,10 +42,10 @@
 
   </div>
 
-  <div class="d-grid gap-2">
-    <a class="nav-link" href="{{ url_for('logout') }}">
-    <button id="logoutbtn" class="btn btn-cancel" style="background-color:gray;border:none" type="button">注销</button>
-    </a>
+  
+  <div class="d-grid gap-2 col-6 mx-auto">
+    <button id="alterpassbtn" class="btn btn-info" type="button">修改密码</button>
+    <button id="logoutbtn" class="btn btn-secondary" type="button">注销</button>
   </div>
 
 </div>
@@ -146,20 +146,17 @@
 
     $('#logoutbtn').bind('click', function() {
       $.ajax({
-            type: "POST",
-            url: '/logout',
+            type: "get",
+            url: '/loginout',
             async : false,
-            data: {'all_data':all_data,"state":state,
-            "quetion_count":window.question_count+window.judgequestion_count+window.multiplequestion_count,
-            'paper_id':window.paper_id,
-            'paper_title':$("#paper_title").val(),
-            'paper_owner':$("#paper_owner option:selected").val(),
-            'hostid':hostid,
-            'departid':departmentid},
             success: function () {
-                window.location.href = $SCRIPT_ROOT+'/paper/list'
+                window.location.href = $SCRIPT_ROOT+'/user/home'
             }
         });
+    });
+
+    $('#alterpassbtn').bind('click', function() {
+      window.location.href = $SCRIPT_ROOT+'/user/alterpassword'
     });
 </script>
 {% endblock %}

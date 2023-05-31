@@ -1,33 +1,69 @@
 {%extends "base.html"%}
 {% block body %}
-
-<div class="article-container" >
-    <h1 id="article_title" >
+<script src="{{url_for('static',filename = 'base/base64.js')}}"></script>
+<div class="article-container">
+    <h1 id="article_title">
     </h1>
     <div id="read_info">
         <span id="modifytime"></span>
         <i class="fa-solid fa-eye"></i>
         <span id="readcountnum"></span>
     </div>
+
+    <div class="list-group">
+        {% for file in filelist %}
+        <a value="{{file['index']}}" target="previewiframe" onclick="dialogshow(this)" class="list-group-item list-group-item-action">
+            <i class="fas fa-file-{{file['type'][0]}} fa-2xl text-{{file['type'][1]}} "></i>
+            <span class="mb-1">{{file['fname']}}</span>
+        </a>
+        {% endfor %}
+    </div>
     <div id="article_content">
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="previewmodal" tabindex="-1" >
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">文件预览</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type=text/javascript>
+
     var title = {{article['title']| tojson}}
     var content = {{article['content']| tojson}}
     var modifytime = {{article['modifytime']| tojson}}
     var article_id = {{article['article_id']| tojson}}
+    var hosturl = {{hosturl| tojson}}
+    var filepreviewurl = {{filepreviewurl| tojson}}
+    var filelist = {{filelist| tojson}}
     var readcountnum = {{readcountnum}}
     var $article_content = document.getElementById('article_content');
     var $article_title = document.getElementById('article_title');
     var $modifytime = document.getElementById('modifytime');
     var $readcountnum = document.getElementById('readcountnum');
+    var previewModal = document.getElementById('previewmodal')
+    var modal = new bootstrap.Modal(previewModal)
+    var modalbody = document.getElementById('modal-body')
     $article_content.innerHTML=content
     $article_title.innerHTML=title
     $modifytime.innerHTML = modifytime
     $readcountnum.innerHTML=readcountnum
-
     window.setTimeout(recordread,5000)
+    previewlist={}
+    for(var i=0;i<filelist.length;i++){
+        
+        previewlist[i]=filelist[i]['url']
+    }
     function recordread(){
         $.ajax({
             type: "post",
@@ -37,9 +73,31 @@
             success: function () {}
           });
     }
-    // 监听 visibility change 事件 
-    
 
+    function dialogshow(obj){
+        iframe = document.createElement('iframe');
+        iframe.id = "tmpframe"
+        previewurl = filepreviewurl+'onlinePreview?url='+
+        encodeURIComponent(Base64.encode(hosturl+'files/getfile/'+previewlist[$(obj).attr("value")]))
+        console.log(previewurl)
+        iframe.src = previewurl
+        iframe.style = "width:100%;height:100%"
+		 modalbody.appendChild(iframe);
+         modal.show()
+    }
+
+    previewModal.addEventListener('hidden.bs.modal', event => {
+        iframe = document.getElementById("tmpframe");
+        iframe.remove()
+    })
+
+
+    
+    // 监听 visibility change 事件 
+    //  var url = 'http://192.168.105.107:5000/files/getfile/learningfilestorage/001/2023-05/同里核酸采集考核登记表-fudz-表单反馈导出_2022-05-02 _1_.xlsx'; //要预览文件的访问地址
+    
+    //  window.location.href = 'http://192.168.105.107:8012/onlinePreview?url='+encodeURIComponent(Base64.encode(url));
+    
 </script>
 
 {%endblock %}

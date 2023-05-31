@@ -16,7 +16,9 @@
             "args": [
                 "run",
                 "--no-debugger",
-                "--no-reload"
+                "--no-reload",
+                "--host",
+                "192.168.105.107"
             ],
             "jinja": true,
             "justMyCode": true
