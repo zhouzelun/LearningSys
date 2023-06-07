@@ -21,7 +21,7 @@ def permission_can(current_user, permission):
     role = database.get_role_byuser(current_user)
     if(role is None):
         return False
-    elif (role.roleid == 0):
+    elif (role.roleid == 1):
         return True
     else:
         return  (role.rolepower & permission) == permission
