@@ -10,4 +10,4 @@ DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(USERNAME,PASSWORD,HOSTNAME,PORT
 SECRET_KEY = 'Xiao!Duan@Tui#Pao$De%Kuai.'
 
 hosturl = 'http://118.89.133.157/'
-filepreviewurl = hosturl+':8012'
+filepreviewurl = 'http://118.89.133.157:8012/'
