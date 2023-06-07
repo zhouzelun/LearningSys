@@ -9,6 +9,7 @@ from selectolax.parser import HTMLParser
 import pypinyin
 from urllib.parse import quote
 import base64
+import config
 bp = Blueprint("information",__name__,url_prefix="/information")
 
 
@@ -225,7 +226,7 @@ def showarticle():
     else:
         article[0].modifytime = article[0].modifytime.strftime("%Y-%m-%d %H:%M:%S")
     return render_template('article_page.html',article=article[0],readcountnum = article[1],\
-                filelist=filelist,hosturl=hosturl,filepreviewurl=filepreviewurl)
+                filelist=filelist,hosturl=config.hosturl,filepreviewurl=config.filepreviewurl)
 
 
 @bp.route('/recordread', methods=['post'])
