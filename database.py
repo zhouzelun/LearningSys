@@ -127,6 +127,47 @@ engine = create_engine(config.DB_URI)
 
 Base.metadata.create_all(engine)
 
+
+def initdata():
+    with Session(engine) as session:
+        Rolelist = [Role(
+            roleid = 1,
+            rolename='management',
+            rolepower=255
+            ),Role(
+            roleid = 2,
+            rolename='user',
+            rolepower=2
+            )]
+        session.add_all(Rolelist)
+        departlist = [
+            Department(
+                departmentid=1,
+                departmentname='测试科室'
+            )
+            ]
+        session.add_all(departlist)
+        userlist = [User(
+                roleid = 1,
+                departmentid=1,
+                username='管理员',
+                workid='001',
+                sex=1,
+                password='123456'
+            ),User(
+                roleid = 2,
+                departmentid=1,
+                username='测试用户啊',
+                workid='002',
+                sex=1,
+                password='123456'
+            )
+            ]
+        session.add_all(userlist)
+        session.commit()
+        
+
+
 def get_alluser():    #获取所有用户
     with Session(engine) as session:
         stmt = select(User)

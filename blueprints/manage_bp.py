@@ -25,3 +25,20 @@ def insertscore():
             namepy = ''.join(i[0] for i in namepylist)
             userlist.append({'userid':item.userid,'name':item.username,'py':namepy})
         return render_template("add_score.html",userlist=userlist)
+    
+@bp.route('/userlist',methods=['GET', 'POST'])
+@permission_required(Permissions.USER_PERMISSION)
+def userlist():
+    if(request.method == 'GET'):
+        return render_template("userlist.html")
+    
+@bp.route('/userlistdata',methods=['GET', 'POST'])
+@permission_required(Permissions.USER_PERMISSION)
+def userlistdata():
+    users = get_alluser()
+    userlist = []
+    for item in users:
+        namepylist = pypinyin.pinyin ( item.username, style=pypinyin.FIRST_LETTER)
+        namepy = ''.join(i[0] for i in namepylist)
+        userlist.append({'userid':item.userid,'workid':item.workid,'name':item.username,'py':namepy})
+    return jsonify(userlist)

@@ -82,3 +82,5 @@ def readdata():
             user_info.append(info)
     table_data  = {'total': 2,'rows':user_info}
     return jsonify(table_data)
+
+

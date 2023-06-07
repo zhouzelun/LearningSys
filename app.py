@@ -99,12 +99,18 @@ def postguidbarjson():
         json.dump(load_dict,load_f)
     return render_template('createcenter.html')
     
+
+
 @app.route('/getguidbarjson',methods=['post','get'])
 def getguidbarjson():
     with open("guidbar.json",'r') as load_f:
         content = load_f.read()
         data = json.loads(content)
     return jsonify(data)
+
+
+def initdata():
+    database.initdata()
 
 if __name__ == '__main__':
     app.run(port=80)
