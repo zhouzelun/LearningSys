@@ -9,6 +9,7 @@ import json
 import logging
 import datetime
 
+
 app = Flask(__name__)
 app.config.from_object(config)
 app.register_blueprint(paper_bp)
@@ -108,7 +109,7 @@ def getguidbarjson():
         data = json.loads(content)
     return jsonify(data)
 
-
+@app.cli.command('initdata')
 def initdata():
     database.initdata()
 
